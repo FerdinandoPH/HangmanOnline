@@ -7,6 +7,7 @@ except:
     sys.exit()
 global stopRecv
 stopRecv=False
+print("GIJUB, funncionas?")
 def FinalizaJuego():
     teclado=pynput.keyboard.Controller()
     for i in range(6):
