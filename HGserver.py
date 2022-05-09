@@ -89,13 +89,15 @@ def handle_client(conn, addr):
                     partidas.update({darid:Partida(darid,int(msg[6:]),conn)})
                     gameId=darid
                     conn.send(("Partida"+str(darid)).encode(FORMAT))
- 
+                elif msg[:6]=="CANCEL":
+                    if msg[6:] in partidas.keys():
+                        del partidas[msg[6:]]
+                        print(f"Partida {msg[6:]} cancelada")
                 elif msg[:6]=="CLIENT":
                     mode="Client"
                     idrequest=msg[6:]
                     if idrequest not in partidas.keys() or partidas[idrequest].j2!=None:
                         conn.send(("Nohay").encode(FORMAT))
-                        conectado=False
                     else:
                         partidas[idrequest].j2=conn
                         dificultad=partidas[idrequest].difficulty
