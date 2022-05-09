@@ -9,8 +9,8 @@ except:
 #Para parar la conexión
 global stopRecv
 stopRecv=False
-PORT=1234
-SERVER="192.168.1.154"
+PORT=44444
+SERVER="80.29.24.47"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
