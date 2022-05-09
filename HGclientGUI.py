@@ -43,8 +43,9 @@ def ConectaAlServer():
     client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client.connect(ADDR)
-        thread=threading.Thread(target=recv_server, args=(client,))
-        thread.start()
+        recvThread=threading.Thread(target=recv_server, args=(client,))
+        recvThread.daemon=True
+        recvThread.start()
         print("Se ha establecido la conexión al servidor")
         InicioOnline(client)
     except:
