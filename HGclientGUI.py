@@ -133,12 +133,12 @@ def recv_server(cliente):
                         gameThread=threading.Thread(target=Juego, args=(cliente,pal,))
                         gameThread.start()
                     '''
-                '''
+                
                 elif msg=="Cerrada":
-                    if gameThread.is_alive():
-                        FinalizaJuego()
-                    print("La partida se ha cerrado")
-                    stopRecv=True
+                    #Pon un mensaje de error diciendo "El otro jugador ha abandonado la partida"
+                    messagebox.showerror("Error","El otro jugador ha abandonado la partida")
+                    InicioOnline(cliente)
+                '''
                 elif msg[:6]=="RESULT":
                     resultado=msg[6:]
                     if resultado=="1":
@@ -193,6 +193,7 @@ def UnirsePartida(cliente):
     #Haz un boton para unirte a la partida
     botonUnirse=Button(root,text="Unirse",command=lambda:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
     #Haz que también se envíe el id si se pulsa enter
+    #idPartidaEntrada.focus_set()
     idPartidaEntrada.bind("<Return>",lambda event:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
     botonUnirse.pack(pady=10)
 def InicioOffline():
@@ -209,11 +210,11 @@ def Ahorcado(pal,cliente=None):
     #Haz una caja de texto para introducir la letra
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
-    letraEntrada.focus_set()
+    #letraEntrada.focus_set()
     #Haz un boton para introducir la letra
     botonLetra=Button(root,text="Enviar",command=lambda:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
     botonLetra.pack(pady=10)
-    botonLetra.bind("<Return>",lambda event:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
+    letraEntrada.bind("<Return>",lambda event:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
     vidaLabel=Label(root,text="Vidas: "+str(vidas))
     vidaLabel.configure(fg="red")
     vidaLabel.pack(pady=5)
