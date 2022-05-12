@@ -203,6 +203,8 @@ def UnirsePartida(cliente):
     botonVolver=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
     botonVolver.pack(pady=10)
 def Ahorcado(pal,cliente=None):
+    global vidas
+    vidas=6
     TkinterClear(root)
     root.geometry("600x400")
     print(pal)
