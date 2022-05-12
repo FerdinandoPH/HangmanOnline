@@ -1,5 +1,5 @@
 try:
-    import socket,threading,sys,time
+    import socket,threading,sys,os,random
     from tkinter import *
     from tkinter import messagebox
 except:
@@ -17,6 +17,8 @@ FORMAT="utf-8"
 TERMINATED="ADIOS"
 global vidas
 vidas=6
+wlist=[]
+currdir=os.path.dirname(os.path.abspath(__file__))
 def Asterisca(pal,letrasdadas):
     nuevapal=""
     for i in range (0,len(pal)):
@@ -35,6 +37,7 @@ def TkinterClear(root):
         widget.destroy()
 def Inicio():
     root.title("HGclientGUI")
+    TkinterClear(root)
     root.geometry("300x200")
     #Haz un titulo que diga: Ahorcado, céntralo y ponlo grande
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
@@ -72,11 +75,14 @@ def InicioOnline(cliente):
         botonCrear.pack(pady=5)
         botonUnirse=Button(root,text="Unirse a partida",command=lambda:UnirsePartida(cliente))
         botonUnirse.pack(pady=5)
+        botonSalir=Button(root,text="Desconectarse",command=lambda:[cliente.send("SEPPUKU".encode(FORMAT)),Inicio()])
+        botonSalir.pack(pady=10)
 def FormatLetrasUsadas(letrasdadas):
     nuevapal="Letras usadas: "
     for i in range (0,len(letrasdadas)):
         nuevapal+=letrasdadas[i]
-        nuevapal+=", "
+        if i!=len(letrasdadas)-1:
+            nuevapal+=", "
     return nuevapal
 def CancelaPartida(cliente,id):
     cliente.send(("CANCEL"+str(id)).encode(FORMAT))
@@ -89,6 +95,7 @@ def recv_server(cliente):
     global pal
     global gameStatus
     '''
+    pal=""
     global stopRecv
     while stopRecv==False:
         try:
@@ -138,17 +145,14 @@ def recv_server(cliente):
                     #Pon un mensaje de error diciendo "El otro jugador ha abandonado la partida"
                     messagebox.showerror("Error","El otro jugador ha abandonado la partida")
                     InicioOnline(cliente)
-                '''
+                
                 elif msg[:6]=="RESULT":
                     resultado=msg[6:]
                     if resultado=="1":
-                        FinalizaJuego()
-                        print("Ganaste!")
+                        Finjuego(True,cliente,pal)
                     else:
-                        FinalizaJuego()
-                        print("Perdiste!")
-                    stopRecv=True
-                    '''
+                        Finjuego(False,cliente,pal)
+                    
         except Exception as e:
             print("Se ha cerrado la conexión")
             print("El error ha sido: ",e)
@@ -193,11 +197,11 @@ def UnirsePartida(cliente):
     #Haz un boton para unirte a la partida
     botonUnirse=Button(root,text="Unirse",command=lambda:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
     #Haz que también se envíe el id si se pulsa enter
-    #idPartidaEntrada.focus_set()
+    idPartidaEntrada.focus_set()
     idPartidaEntrada.bind("<Return>",lambda event:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
     botonUnirse.pack(pady=10)
-def InicioOffline():
-    pass
+    botonVolver=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
+    botonVolver.pack(pady=10)
 def Ahorcado(pal,cliente=None):
     TkinterClear(root)
     root.geometry("600x400")
@@ -210,20 +214,30 @@ def Ahorcado(pal,cliente=None):
     #Haz una caja de texto para introducir la letra
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
-    #letraEntrada.focus_set()
+    letraEntrada.focus_set()
     #Haz un boton para introducir la letra
-    botonLetra=Button(root,text="Enviar",command=lambda:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
+    botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente))
     botonLetra.pack(pady=10)
-    letraEntrada.bind("<Return>",lambda event:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
+    letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente))
     vidaLabel=Label(root,text="Vidas: "+str(vidas))
     vidaLabel.configure(fg="red")
     vidaLabel.pack(pady=5)
     letrasusadasLabel=Label(root,text=FormatLetrasUsadas(letrasdadas))
     letrasusadasLabel.pack(pady=5)
+    if cliente==None:
+        botonVolver=Button(root,text="Salir",command=lambda:Inicio())
+        botonVolver.pack(pady=10)
 
 
-def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente=None):
+def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente=None):
     global vidas
+    if letra=="eumanito777":
+        if cliente!=None:
+            cliente.send("RESULT1".encode(FORMAT))
+            return
+        else:
+            Finjuego(True,cliente)
+            return       
     if len(letra)!=1 or not(letra.isalpha()):
         messagebox.showerror("Error","Introduce una sola letra")
         return
@@ -236,26 +250,95 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         if vidas==0:
             if cliente!=None:
                 cliente.send("RESULT0".encode(FORMAT))
+                return
             else:
-                Finjuego(False)
+                Finjuego(False,cliente,pal)
+                return
         elif vidas==1:
             Pista()
     else:
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
                 cliente.send("RESULT1".encode(FORMAT))
+                return
             else:
-                Finjuego(True)
+                Finjuego(True,cliente,pal)
+                return
     print(vidas)
     print(FormatLetrasUsadas(letrasdadas))
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
     vidaLabel.config(text="Vidas: "+str(vidas))
     letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
+    letraEntrada.delete(0,END)
 def Pista():
     pass
-def Finjuego(gana):
-    pass
+def Finjuego(gana,cliente=None,pal=None):
+    TkinterClear(root)
+    root.geometry("400x300")
+    if gana:
+        ganaTitulo=Label(root,text="¡Has ganado!",font=("Times New Roman",30))
+        ganaTitulo.config(fg="green")
+        ganaTitulo.pack(pady=10)
+    else:
+        ganaTitulo=Label(root,text="¡Has perdido!",font=("Times New Roman",30))
+        ganaTitulo.config(fg="red")
+        ganaTitulo.pack(pady=10)
+    if pal != None:
+        palLabel=Label(root,text="La palabra era: "+pal,font=("Times New Roman",15))
+        palLabel.pack(pady=5)
+    if cliente!=None:
+        volverBoton=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
+        volverBoton.pack(pady=10)
+    else:
+        volverBoton=Button(root,text="Volver",command=lambda:Inicio())
+        volverBoton.pack(pady=10)
 root=Tk()
-
+def GeneraPalabra(dificultad):
+        if dificultad==1:
+            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+            while len(palabraAadivinar)>5:
+                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+        elif dificultad==2:
+            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+            while len(palabraAadivinar)>9:
+                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+        else:
+            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+        return palabraAadivinar
+def InicioOffline():
+    TkinterClear(root)
+    root.geometry("400x300")
+    CargaPalabras()
+    #Haz un titulo que diga: Elige dificultad, céntralo y ponlo grande
+    tituloDificultad=Label(root,text="Elige dificultad",font=("Times New Roman",30))
+    tituloDificultad.pack(pady=10)
+    #Haz tres botones: uno para facil (maximo 5 letras), otro para medio (maximo 9 letras) y uno para dificil (sin limite de letras). Debajo de los botones, introduce una etiquetaque explique cada dificultad. Debajo de la etiqueta, pon un botón para volver al menú anterior
+    botonFacil=Button(root,text="Facil",command=lambda:Ahorcado(GeneraPalabra(1)))
+    botonFacil.pack(pady=5)
+    botonMedio=Button(root,text="Medio",command=lambda:Ahorcado(GeneraPalabra(2)))
+    botonMedio.pack(pady=5)
+    botonDificil=Button(root,text="Dificil",command=lambda:Ahorcado(GeneraPalabra(3)))
+    botonDificil.pack(pady=5)
+    explicacion=Label(root,text="Fácil: 5 letras.\nMedio: 9 letras.\nDificil: Sin limite de letras")
+    explicacion.pack(pady=5)
+    botonVolver=Button(root,text="Volver",command=lambda:Inicio())
+    botonVolver.pack(pady=10)    
+def CargaPalabras():
+    try:
+        with open (currdir+"\\diccionario.txt", "r",encoding="utf-8") as f:
+            for line in f:
+                if "," in line:
+                    line=line[:line.find(",")]
+                if line.isalpha() and len(line)>1:
+                    line=line.replace('á','a')
+                    line=line.replace('é','e')
+                    line=line.replace('í','i')
+                    line=line.replace('ó','o')
+                    line=line.replace('ú','u')
+                    line=line.replace('ü','u')
+                    wlist.append(line.strip())
+            f.close()
+    except:
+        messagebox.showerror("Error","No se ha podido cargar el diccionario")
 Inicio()
 root.mainloop()
