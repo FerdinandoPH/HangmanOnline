@@ -1,9 +1,7 @@
-from signal import valid_signals
-
-
 try:
     import socket,threading,sys,time
     from tkinter import *
+    from tkinter import messagebox
 except:
     import os,sys
     os.system("pip install pynput")
@@ -12,8 +10,8 @@ except:
 #Para parar la conexión
 global stopRecv
 stopRecv=False
-PORT=1234
-SERVER="10.227.31.235"
+PORT=44444
+SERVER="80.29.24.47"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
@@ -23,7 +21,7 @@ def Asterisca(pal,letrasdadas):
     nuevapal=""
     for i in range (0,len(pal)):
         if pal[i] not in letrasdadas:
-            nuevapal+="_"
+            nuevapal+="*"
         else:
             nuevapal+=pal[i]
     return nuevapal
@@ -74,7 +72,12 @@ def InicioOnline(cliente):
         botonCrear.pack(pady=5)
         botonUnirse=Button(root,text="Unirse a partida",command=lambda:UnirsePartida(cliente))
         botonUnirse.pack(pady=5)
-
+def FormatLetrasUsadas(letrasdadas):
+    nuevapal="Letras usadas: "
+    for i in range (0,len(letrasdadas)):
+        nuevapal+=letrasdadas[i]
+        nuevapal+=", "
+    return nuevapal
 def CancelaPartida(cliente,id):
     cliente.send(("CANCEL"+str(id)).encode(FORMAT))
     print("Partida cancelada")
@@ -183,6 +186,7 @@ def UnirsePartida(cliente):
     tituloUnirse.pack(pady=10)
     promptEntrada=Label(root,text="Introduce el id de la partida")
     promptEntrada.pack(pady=5)
+    promptEntrada.focus_set()
     #Haz una caja de texto para introducir el id de la partida
     idPartidaEntrada=Entry(root)
     idPartidaEntrada.pack(pady=5)
@@ -194,34 +198,63 @@ def UnirsePartida(cliente):
 def InicioOffline():
     pass
 def Ahorcado(pal,cliente=None):
+    TkinterClear(root)
+    root.geometry("600x400")
+    print(pal)
     letrasdadas=[]
     adivinaTitulo=Label(root,text="Adivina la palabra",font=("Times New Roman",30))
     adivinaTitulo.pack(pady=10)
-    palabraLabel=Label(root,text=Asterisca(pal,letrasdadas))
+    palabraLabel=Label(root,text=Asterisca(pal,letrasdadas),font=("Times New Roman",15))
     palabraLabel.pack(pady=5)
     #Haz una caja de texto para introducir la letra
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
+    letraEntrada.focus_set()
     #Haz un boton para introducir la letra
-    botonLetra=Button(root,text="Enviar",command=lambda:[letrasdadas.append(letraEntrada.get().lower()),palabraLabel.config(text=Asterisca(pal,letrasdadas)),letraEntrada.delete(0,END),EsCorrecto(pal,letraEntrada.get().lower(),letrasdadas,cliente)])
+    botonLetra=Button(root,text="Enviar",command=lambda:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
     botonLetra.pack(pady=10)
-    botonLetra.bind("<Return>",lambda event:[letrasdadas.append(letraEntrada.get().lower()),palabraLabel.config(text=Asterisca(pal,letrasdadas)),letraEntrada.delete(0,END),EsCorrecto(pal,letraEntrada.get().lower(),letrasdadas,cliente)])
-def EsCorrecto(pal,letra,letrasdadas,cliente=None):
+    botonLetra.bind("<Return>",lambda event:[ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente),letraEntrada.delete(0,END)])
+    vidaLabel=Label(root,text="Vidas: "+str(vidas))
+    vidaLabel.configure(fg="red")
+    vidaLabel.pack(pady=5)
+    letrasusadasLabel=Label(root,text=FormatLetrasUsadas(letrasdadas))
+    letrasusadasLabel.pack(pady=5)
+
+
+def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,cliente=None):
     global vidas
+    if len(letra)!=1 or not(letra.isalpha()):
+        messagebox.showerror("Error","Introduce una sola letra")
+        return
+    if letra in letrasdadas:
+        messagebox.showinfo("","Ya has introducido esa letra")
+        return
+    letrasdadas.append(letra.lower())
     if letra not in pal:
         vidas-=1
         if vidas==0:
             if cliente!=None:
                 cliente.send("RESULT0".encode(FORMAT))
+            else:
+                Finjuego(False)
         elif vidas==1:
             Pista()
     else:
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
                 cliente.send("RESULT1".encode(FORMAT))
+            else:
+                Finjuego(True)
+    print(vidas)
+    print(FormatLetrasUsadas(letrasdadas))
+    palabraLabel.config(text=Asterisca(pal,letrasdadas))
+    vidaLabel.config(text="Vidas: "+str(vidas))
+    letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
 def Pista():
     pass
-
+def Finjuego(gana):
+    pass
 root=Tk()
+
 Inicio()
 root.mainloop()
