@@ -339,6 +339,6 @@ def CargaPalabras():
                     wlist.append(line.strip())
             f.close()
     except:
-        messagebox.showerror("Error","No se ha podido cargar el diccionario")
+        messagebox.showerror("Error","No se ha podido cargar la lista de palabras. Comprueba que el archivo diccionario.txt esté en la carpeta del programa")
 Inicio()
 root.mainloop()
