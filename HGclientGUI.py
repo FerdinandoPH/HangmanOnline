@@ -1,5 +1,5 @@
 try:
-    import socket,threading,sys,os,random
+    import socket,threading,sys,os,random,time
     from tkinter import *
     from tkinter import messagebox
 except:
@@ -35,10 +35,18 @@ def TkinterClear(root):
     #print(activos)
     for widget in activos:
         widget.destroy()
+def Reloj():
+    root.configure(background=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"]))
+    reloj=threading.Thread(target=Reloj)
+    time.sleep(2)
+    reloj.daemon=True
+    reloj.start()
 def Inicio():
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("300x200")
+    #llama a la funcion reloj
+    Reloj()
     #Haz un titulo que diga: Ahorcado, céntralo y ponlo grande
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
