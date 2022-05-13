@@ -343,4 +343,6 @@ def CargaPalabras():
     except:
         messagebox.showerror("Error","No se ha podido cargar la lista de palabras. Comprueba que el archivo diccionario.txt esté en la carpeta del programa")
 Inicio()
+def PullPrueba():
+    print("Sigo intentando aprender como va github")
 root.mainloop()
