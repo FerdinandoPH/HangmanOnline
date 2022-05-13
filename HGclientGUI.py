@@ -240,7 +240,10 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         else:
             Finjuego(True,cliente)
             return       
-    if len(letra)!=1 or not(letra.isalpha()):
+    if len(letra)<1:
+        messagebox.showerror("Error","Introduce alguna letra")
+        return
+    if len(letra)>1 or not(letra.isalpha()):
         messagebox.showerror("Error","Introduce una sola letra")
         return
     if letra in letrasdadas:
@@ -257,7 +260,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
                 Finjuego(False,cliente,pal)
                 return
         elif vidas==1:
-            Pista()
+            Pista(pal)
     else:
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
@@ -272,8 +275,10 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     vidaLabel.config(text="Vidas: "+str(vidas))
     letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
     letraEntrada.delete(0,END)
-def Pista():
-    pass
+#haz que aparezca una ventana emergente que te ponga la primera letra de la palabra a adivinar
+def Pista(pal):
+    messagebox.showinfo("","Pista: La primera letra de la palabra es: "+pal[0])
+    return
 def Finjuego(gana,cliente=None,pal=None):
     TkinterClear(root)
     root.geometry("400x300")
