@@ -1,16 +1,16 @@
 try:
-    import socket,threading,sys,os,random,time
+    import socket,threading,sys,os,random,time,pygame
     from tkinter import *
     from tkinter import messagebox
 except:
     import os,sys
-    os.system("pip install pynput")
+    os.system("pip install pygame")
     print("Se han instalado las dependencias")
     sys.exit()
 #Para parar la conexión
 global stopRecv
 global colorclock
-colorclock=True
+colorclock=False
 stopRecv=False
 PORT=44444
 SERVER="80.29.24.47"
@@ -21,6 +21,7 @@ global vidas
 vidas=6
 wlist=[]
 currdir=os.path.dirname(os.path.abspath(__file__))
+pygame.init()
 def Asterisca(pal,letrasdadas):
     nuevapal=""
     for i in range (0,len(pal)):
@@ -47,13 +48,17 @@ def Blanquear(root):
     for widget in root.pack_slaves():
         if widget.winfo_class()=="Label":
             widget.configure(background="white")
-def Pausa(root):
+def Pausa(root,boton=None):
     global colorclock
     if colorclock==True:
         colorclock=False
+        if boton!=None:
+            boton.config(text="Fondo de colores OFF")
         root.after(2000,lambda:Blanquear(root))
     else:
         colorclock=True
+        if boton!=None:
+            boton.config(text="Fondo de colores ON")
         clockThread=threading.Thread(target=ColorThread, args=(root,))
         clockThread.daemon=True
         clockThread.start()
@@ -74,12 +79,10 @@ def Inicio():
     global colorclock
     root.title("HGclientGUI")
     TkinterClear(root)
-    root.geometry("300x200")
+    root.geometry("400x300")
     #llama a la funcion reloj
     startclock=True
-    print(threading.enumerate())
     for hilo in threading.enumerate():
-        print(hilo.name)
         if "ColorThread" in hilo.name:
             startclock=False
             break
@@ -99,7 +102,10 @@ def Inicio():
     #Haz un boton que diga: Salir
     botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
     botonSalir.pack(pady=10)
-    botonPausa=Button(root,text="Pausa",command=lambda:Pausa(root))
+    if colorclock:
+        botonPausa=Button(root,text="Fondo de colores ON",command=lambda:Pausa(root,botonPausa))
+    else:
+        botonPausa=Button(root,text="Fondo de colores OFF",command=lambda:Pausa(root,botonPausa))
     botonPausa.pack(pady=10)
 def ConectaAlServer():
     global stopRecv
@@ -382,7 +388,7 @@ def InicioOffline():
     botonVolver.pack(pady=10)    
 def CargaPalabras():
     try:
-        with open (currdir+"\\diccionario.txt", "r",encoding="utf-8") as f:
+        with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
             for line in f:
                 if "," in line:
                     line=line[:line.find(",")]
