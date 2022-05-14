@@ -42,6 +42,7 @@ def Pausa():
     global stopRecv
     stopRecv=True
     return"""
+<<<<<<< HEAD
 def Blanquear(root):
     root.configure(background="white")
     for widget in root.pack_slaves():
@@ -70,12 +71,21 @@ def Reloj(raiz):
     for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label":
             widget.configure(background=color)
+=======
+def Reloj():
+    root.configure(background=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"]))
+    reloj=threading.Thread(target=Reloj)
+    time.sleep(2)
+    reloj.daemon=True
+    reloj.start()
+>>>>>>> 1dfc450862ec1bdd73cfaebc48f83088e4c88950
 def Inicio():
     global colorclock
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("300x200")
     #llama a la funcion reloj
+<<<<<<< HEAD
     startclock=True
     print(threading.enumerate())
     for hilo in threading.enumerate():
@@ -87,6 +97,9 @@ def Inicio():
         clockThread=threading.Thread(target=ColorThread, args=(root,))
         clockThread.daemon=True
         clockThread.start()   
+=======
+    Reloj()
+>>>>>>> 1dfc450862ec1bdd73cfaebc48f83088e4c88950
     #Haz un titulo que diga: Ahorcado, céntralo y ponlo grande
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
