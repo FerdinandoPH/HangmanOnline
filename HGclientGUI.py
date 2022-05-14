@@ -35,6 +35,11 @@ def TkinterClear(root):
     #print(activos)
     for widget in activos:
         widget.destroy()
+"""#haz un boton que pare la funcion reloj
+def Pausa():
+    global stopRecv
+    stopRecv=True
+    return"""
 def Reloj():
     root.configure(background=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"]))
     reloj=threading.Thread(target=Reloj)
