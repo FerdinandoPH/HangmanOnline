@@ -1,5 +1,5 @@
 try:
-    import socket,threading,sys,os,random
+    import socket,threading,sys,os,random,time
     from tkinter import *
     from tkinter import messagebox
 except:
@@ -9,6 +9,8 @@ except:
     sys.exit()
 #Para parar la conexión
 global stopRecv
+global colorclock
+colorclock=True
 stopRecv=False
 PORT=44444
 SERVER="80.29.24.47"
@@ -35,10 +37,56 @@ def TkinterClear(root):
     #print(activos)
     for widget in activos:
         widget.destroy()
+"""#haz un boton que pare la funcion reloj
+def Pausa():
+    global stopRecv
+    stopRecv=True
+    return"""
+def Blanquear(root):
+    root.configure(background="white")
+    for widget in root.pack_slaves():
+        if widget.winfo_class()=="Label":
+            widget.configure(background="white")
+def Pausa(root):
+    global colorclock
+    if colorclock==True:
+        colorclock=False
+        root.after(2000,lambda:Blanquear(root))
+    else:
+        colorclock=True
+        clockThread=threading.Thread(target=ColorThread, args=(root,))
+        clockThread.daemon=True
+        clockThread.start()
+def ColorThread(raiz):
+    global colorclock
+    while colorclock:
+        time.sleep(2)
+        Reloj(raiz)
+def Reloj(raiz):
+    color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
+    while color==raiz.cget("bg"):
+        color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
+    raiz.configure(background=color)
+    for widget in raiz.pack_slaves():
+        if widget.winfo_class()=="Label":
+            widget.configure(background=color)
 def Inicio():
+    global colorclock
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("300x200")
+    #llama a la funcion reloj
+    startclock=True
+    print(threading.enumerate())
+    for hilo in threading.enumerate():
+        print(hilo.name)
+        if "ColorThread" in hilo.name:
+            startclock=False
+            break
+    if startclock and colorclock:
+        clockThread=threading.Thread(target=ColorThread, args=(root,))
+        clockThread.daemon=True
+        clockThread.start()   
     #Haz un titulo que diga: Ahorcado, céntralo y ponlo grande
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
@@ -51,6 +99,8 @@ def Inicio():
     #Haz un boton que diga: Salir
     botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
     botonSalir.pack(pady=10)
+    botonPausa=Button(root,text="Pausa",command=lambda:Pausa(root))
+    botonPausa.pack(pady=10)
 def ConectaAlServer():
     global stopRecv
     stopRecv=False
