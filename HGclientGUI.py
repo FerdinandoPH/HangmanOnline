@@ -43,18 +43,12 @@ def Pausa():
     global stopRecv
     stopRecv=True
     return"""
-def Blanquear(root):
-    root.configure(background="white")
-    for widget in root.pack_slaves():
-        if widget.winfo_class()=="Label":
-            widget.configure(background="white")
 def Pausa(root,boton=None):
     global colorclock
     if colorclock==True:
         colorclock=False
         if boton!=None:
             boton.config(text="Fondo de colores OFF")
-        root.after(2000,lambda:Blanquear(root))
     else:
         colorclock=True
         if boton!=None:
@@ -67,6 +61,10 @@ def ColorThread(raiz):
     while colorclock:
         time.sleep(2)
         Reloj(raiz)
+    root.configure(background="white")
+    for widget in root.pack_slaves():
+        if widget.winfo_class()=="Label":
+            widget.configure(background="white")
 def Reloj(raiz):
     color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
     while color==raiz.cget("bg"):
