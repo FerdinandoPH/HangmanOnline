@@ -11,6 +11,10 @@ except:
 global stopRecv
 global colorclock
 colorclock=False
+global musica
+musica=True
+global cancionActual
+cancionActual=""
 stopRecv=False
 PORT=44444
 SERVER="80.29.24.47"
@@ -30,8 +34,12 @@ def Asterisca(pal,letrasdadas):
         else:
             nuevapal+=pal[i]
     return nuevapal
-def TkinterClear(root):
+def TkinterClear(root,keepmusic=False,exceptosicancion=""):
+    global cancionActual
     #Limpia la ventana de todos los objetos colocados con pack, place o grid
+    if keepmusic==False and cancionActual!=exceptosicancion:
+        pygame.mixer.music.stop()
+        cancionActual=""
     activos=root.pack_slaves()
     activos+=(root.place_slaves())
     activos+=(root.grid_slaves())
@@ -75,6 +83,7 @@ def Reloj(raiz):
             widget.configure(background=color)
 def Inicio():
     global colorclock
+    global musica
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("400x300")
@@ -105,6 +114,24 @@ def Inicio():
     else:
         botonPausa=Button(root,text="Fondo de colores OFF",command=lambda:Pausa(root,botonPausa))
     botonPausa.pack(pady=10)
+    if musica:
+        botonMusica=Button(root,text="Musica ON",command=lambda:CambiaMusica(botonMusica))
+    else:
+        botonMusica=Button(root,text="Musica OFF",command=lambda:CambiaMusica(botonMusica))
+    botonMusica.pack(pady=10)
+def CambiaMusica(boton=None):
+    global musica
+    global cancionActual
+    if musica==True:
+        musica=False
+        cancionActual=""
+        if boton!=None:
+            boton.config(text="Musica OFF")
+    else:
+        musica=True
+        if boton!=None:
+            boton.config(text="Musica ON")
+        
 def ConectaAlServer():
     global stopRecv
     stopRecv=False
@@ -119,18 +146,24 @@ def ConectaAlServer():
     except:
         print("Parece que el servidor no funciona. Inténtalo más tarde")
 def InicioOnline(cliente):
-        TkinterClear(root)
-        root.geometry("300x200")
-        #Haz un titulo que diga: Modo online, céntralo y ponlo grande
-        tituloOnline=Label(root,text="Modo online",font=("Times New Roman",30))
-        tituloOnline.pack(pady=10)
-        #Crea un botón para crear una partida y a la derecha un botón para unirse a una partida
-        botonCrear=Button(root,text="Crear partida",command=lambda:CrearPartida(cliente))
-        botonCrear.pack(pady=5)
-        botonUnirse=Button(root,text="Unirse a partida",command=lambda:UnirsePartida(cliente))
-        botonUnirse.pack(pady=5)
-        botonSalir=Button(root,text="Desconectarse",command=lambda:[cliente.send("SEPPUKU".encode(FORMAT)),Inicio()])
-        botonSalir.pack(pady=10)
+    global musica
+    global cancionActual
+    TkinterClear(root,False,"menu")
+    if musica and cancionActual!="menu":
+        cancionActual="menu"
+        pygame.mixer.music.load(currdir+"\\Assets\\Musica\\menuMusic.mp3")
+        pygame.mixer.music.play(-1)
+    root.geometry("300x200")
+    #Haz un titulo que diga: Modo online, céntralo y ponlo grande
+    tituloOnline=Label(root,text="Modo online",font=("Times New Roman",30))
+    tituloOnline.pack(pady=10)
+    #Crea un botón para crear una partida y a la derecha un botón para unirse a una partida
+    botonCrear=Button(root,text="Crear partida",command=lambda:CrearPartida(cliente))
+    botonCrear.pack(pady=5)
+    botonUnirse=Button(root,text="Unirse a partida",command=lambda:UnirsePartida(cliente))
+    botonUnirse.pack(pady=5)
+    botonSalir=Button(root,text="Desconectarse",command=lambda:[cliente.send("SEPPUKU".encode(FORMAT)),Inicio()])
+    botonSalir.pack(pady=10)
 def FormatLetrasUsadas(letrasdadas):
     nuevapal="Letras usadas: "
     for i in range (0,len(letrasdadas)):
@@ -218,7 +251,7 @@ def recv_server(cliente):
         print("Se ha intentado cerrar la conexión de forma limpia")
     cliente.close()    
 def CrearPartida(cliente):
-    TkinterClear(root)
+    TkinterClear(root,True)
     root.geometry("400x300")
     #Haz un titulo que diga: Elige dificultad, céntralo y ponlo grande
     tituloDificultad=Label(root,text="Elige dificultad",font=("Times New Roman",30))
@@ -237,7 +270,7 @@ def CrearPartida(cliente):
 
 
 def UnirsePartida(cliente):
-    TkinterClear(root)
+    TkinterClear(root,True)
     root.geometry("400x300")
     #Haz un titulo que diga: Unirse a una partida, céntralo y ponlo grande
     tituloUnirse=Label(root,text="Unirse a una partida",font=("Times New Roman",30))
@@ -367,7 +400,13 @@ def GeneraPalabra(dificultad):
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
         return palabraAadivinar
 def InicioOffline():
+    global musica
+    global cancionActual
     TkinterClear(root)
+    if musica and cancionActual!="menu":
+        cancionActual="menu"
+        pygame.mixer.music.load(currdir+"\\Assets\\Musica\\menuMusic.mp3")
+        pygame.mixer.music.play(-1)
     root.geometry("400x300")
     CargaPalabras()
     #Haz un titulo que diga: Elige dificultad, céntralo y ponlo grande
