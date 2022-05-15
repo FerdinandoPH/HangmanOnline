@@ -79,7 +79,7 @@ def Reloj(raiz):
         color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
     for widget in raiz.pack_slaves():
-        if widget.winfo_class()=="Label":
+        if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
             widget.configure(background=color)
 def Inicio():
     global colorclock
