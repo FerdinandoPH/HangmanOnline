@@ -61,8 +61,8 @@ def ColorThread(raiz):
     while colorclock:
         time.sleep(2)
         Reloj(raiz)
-    root.configure(background="white")
-    for widget in root.pack_slaves():
+    raiz.configure(background="white")
+    for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label":
             widget.configure(background="white")
 def Reloj(raiz):
