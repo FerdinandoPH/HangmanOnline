@@ -144,7 +144,7 @@ def ConectaAlServer():
         print("Se ha establecido la conexión al servidor")
         InicioOnline(client)
     except:
-        print("Parece que el servidor no funciona. Inténtalo más tarde")
+        messagebox.showerror("","Parece que el servidor no funciona. Inténtalo más tarde")
 def InicioOnline(cliente):
     global musica
     global cancionActual
