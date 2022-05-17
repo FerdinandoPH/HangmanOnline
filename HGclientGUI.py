@@ -25,7 +25,20 @@ global vidas
 vidas=6
 wlist=[]
 currdir=os.path.dirname(os.path.abspath(__file__))
+root=Tk()
+
+horca0=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca.gif")
+horca1=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca1.gif")
+horca2=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca2.gif")
+horca3=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca3.gif")
+horca4=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca4.gif")
+horca5=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca5.gif")
+horca6=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca6.gif")
+imagenes=[horca0,horca1,horca2,horca3,horca4,horca5,horca6]
 pygame.init()
+global efectosSonido
+pygame.mixer.set_num_channels(8)
+efectosSonido=pygame.mixer.Channel(0)
 def Asterisca(pal,letrasdadas):
     nuevapal=""
     for i in range (0,len(pal)):
@@ -36,9 +49,11 @@ def Asterisca(pal,letrasdadas):
     return nuevapal
 def TkinterClear(root,keepmusic=False,exceptosicancion=""):
     global cancionActual
+    global efectosSonido
     #Limpia la ventana de todos los objetos colocados con pack, place o grid
     if keepmusic==False and cancionActual!=exceptosicancion:
         pygame.mixer.music.stop()
+        efectosSonido.stop()
         cancionActual=""
     activos=root.pack_slaves()
     activos+=(root.place_slaves())
@@ -217,16 +232,6 @@ def recv_server(cliente):
                 elif msg[:2]=="Ok":
                     pal=msg[2:]
                     Ahorcado(pal,cliente)
-                    '''
-                    if mode=="J1":
-                        print("Conectado! La palabra es: "+pal)
-                        gameThread=threading.Thread(target=Juego, args=(cliente,pal,))
-                        gameThread.start()
-                    else:
-                        print("Te has unido! La palabra es: "+pal)
-                        gameThread=threading.Thread(target=Juego, args=(cliente,pal,))
-                        gameThread.start()
-                    '''
                 
                 elif msg=="Cerrada":
                     #Pon un mensaje de error diciendo "El otro jugador ha abandonado la partida"
@@ -293,7 +298,7 @@ def Ahorcado(pal,cliente=None):
     global vidas
     vidas=6
     TkinterClear(root)
-    root.geometry("600x400")
+    root.geometry("600x550")
     print(pal)
     letrasdadas=[]
     adivinaTitulo=Label(root,text="Adivina la palabra",font=("Times New Roman",30))
@@ -305,9 +310,11 @@ def Ahorcado(pal,cliente=None):
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
     #Haz un boton para introducir la letra
-    botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente))
+    botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
     botonLetra.pack(pady=10)
-    letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente))
+    letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
+    horcaLabel=Label(root,image=imagenes[6-vidas])
+    horcaLabel.pack(pady=5)
     vidaLabel=Label(root,text="Vidas: "+str(vidas))
     vidaLabel.configure(fg="red")
     vidaLabel.pack(pady=5)
@@ -318,7 +325,7 @@ def Ahorcado(pal,cliente=None):
         botonVolver.pack(pady=10)
 
 
-def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,cliente=None):
+def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente=None):
     global vidas
     if letra=="eumanito777":
         if cliente!=None:
@@ -326,7 +333,14 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
             return
         else:
             Finjuego(True,cliente)
-            return       
+            return
+    if letra=="flamenc0":
+        if cliente!=None:
+            cliente.send("RESULT0".encode(FORMAT))
+            return
+        else:
+            Finjuego(False,cliente,pal)
+            return
     if len(letra)<1:
         messagebox.showerror("Error","Introduce alguna letra")
         return
@@ -347,7 +361,8 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
                 Finjuego(False,cliente,pal)
                 return
         elif vidas==1:
-            Pista(pal)
+            #Pista(pal)
+            pass
     else:
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
@@ -360,6 +375,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     print(FormatLetrasUsadas(letrasdadas))
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
     vidaLabel.config(text="Vidas: "+str(vidas))
+    horcaLabel.config(image=imagenes[6-vidas])
     letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
     letraEntrada.delete(0,END)
 #haz que aparezca una ventana emergente que te ponga la primera letra de la palabra a adivinar
@@ -367,6 +383,8 @@ def Pista(pal):
     messagebox.showinfo("","Pista: La primera letra de la palabra es: "+pal[0])
     return
 def Finjuego(gana,cliente=None,pal=None):
+    global efectosSonido
+    global cancionActual
     TkinterClear(root)
     root.geometry("400x300")
     if gana:
@@ -377,6 +395,11 @@ def Finjuego(gana,cliente=None,pal=None):
         ganaTitulo=Label(root,text="¡Has perdido!",font=("Times New Roman",30))
         ganaTitulo.config(fg="red")
         ganaTitulo.pack(pady=10)
+        if musica and cancionActual!="gameOver":
+            cancionActual="gameOver"
+            gameOverSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\gameOverMusic.mp3")
+            efectosSonido.play(gameOverSonido)
+    
     if pal != None:
         palLabel=Label(root,text="La palabra era: "+pal,font=("Times New Roman",15))
         palLabel.pack(pady=5)
@@ -386,7 +409,6 @@ def Finjuego(gana,cliente=None,pal=None):
     else:
         volverBoton=Button(root,text="Volver",command=lambda:Inicio())
         volverBoton.pack(pady=10)
-root=Tk()
 def GeneraPalabra(dificultad):
         if dificultad==1:
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
