@@ -26,7 +26,7 @@ vidas=6
 wlist=[]
 currdir=os.path.dirname(os.path.abspath(__file__))
 root=Tk()
-
+letrasdadas=[]
 horca0=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca.gif")
 horca1=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca1.gif")
 horca2=PhotoImage(file=currdir+"\\Assets\\Imgs\\horca2.gif")
@@ -53,6 +53,7 @@ def TkinterClear(root,keepmusic=False,exceptosicancion=""):
     #Limpia la ventana de todos los objetos colocados con pack, place o grid
     if keepmusic==False and cancionActual!=exceptosicancion:
         pygame.mixer.music.stop()
+        pygame.mixer.music.set_volume(1)
         efectosSonido.stop()
         cancionActual=""
     activos=root.pack_slaves()
@@ -89,9 +90,9 @@ def ColorThread(raiz):
         if widget.winfo_class()=="Label":
             widget.configure(background="white")
 def Reloj(raiz):
-    color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
+    color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     while color==raiz.cget("bg"):
-        color=random.choice(["#ff0000","#00ff00","#0000ff","#ffff00","#00ffff","#ff00ff"])
+        color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
     for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
@@ -121,9 +122,6 @@ def Inicio():
     #Haz un boton que diga: Iniciar partida offline a la derecha del boton anterior
     botonOffline=Button(root,text="Iniciar partida offline",command=InicioOffline)
     botonOffline.pack(pady=5)
-    #Haz un boton que diga: Salir
-    botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
-    botonSalir.pack(pady=10)
     if colorclock:
         botonPausa=Button(root,text="Fondo de colores ON",command=lambda:Pausa(root,botonPausa))
     else:
@@ -134,6 +132,8 @@ def Inicio():
     else:
         botonMusica=Button(root,text="Musica OFF",command=lambda:CambiaMusica(botonMusica))
     botonMusica.pack(pady=10)
+    botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
+    botonSalir.pack(pady=10)
 def CambiaMusica(boton=None):
     global musica
     global cancionActual
@@ -217,7 +217,7 @@ def recv_server(cliente):
                     nohayLabel.pack(pady=10)
                 elif msg[:7]=="Partida":
                     idpartida=msg[7:]
-                    TkinterClear(root)
+                    TkinterClear(root,True)
                     root.geometry("300x200")
                     #Haz un titulo que diga: Esperando a J2, céntralo y ponlo grande
                     tituloEspera=Label(root,text="Esperando a J2",font=("Times New Roman",30))
@@ -296,11 +296,17 @@ def UnirsePartida(cliente):
     botonVolver.pack(pady=10)
 def Ahorcado(pal,cliente=None):
     global vidas
+    global cancionActual
     vidas=6
+    letrasdadas.clear()
     TkinterClear(root)
+    if musica and cancionActual!="main":
+        cancionActual="main"
+        pygame.mixer.music.load(currdir+"\\Assets\\Musica\\mainMusic.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)  
     root.geometry("600x550")
-    print(pal)
-    letrasdadas=[]
+    #print(pal)
     adivinaTitulo=Label(root,text="Adivina la palabra",font=("Times New Roman",30))
     adivinaTitulo.pack(pady=10)
     palabraLabel=Label(root,text=Asterisca(pal,letrasdadas),font=("Times New Roman",15))
@@ -327,14 +333,19 @@ def Ahorcado(pal,cliente=None):
 
 def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente=None):
     global vidas
+    global cancionActual
+    global efectosSonido
     if letra=="eumanito777":
+        for letra in pal:
+            letrasdadas.append(letra)
         if cliente!=None:
             cliente.send("RESULT1".encode(FORMAT))
             return
         else:
-            Finjuego(True,cliente)
+            Finjuego(True,cliente,pal)
             return
     if letra=="flamenc0":
+        vidas=0
         if cliente!=None:
             cliente.send("RESULT0".encode(FORMAT))
             return
@@ -346,12 +357,18 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         return
     if len(letra)>1 or not(letra.isalpha()):
         messagebox.showerror("Error","Introduce una sola letra")
+        letraEntrada.delete(0,END)
         return
     if letra in letrasdadas:
         messagebox.showinfo("","Ya has introducido esa letra")
+        letraEntrada.delete(0,END)
         return
     letrasdadas.append(letra.lower())
     if letra not in pal:
+        cancionActual="incorrecto"
+        incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
+        if efectosSonido.get_busy()==False:
+            efectosSonido.play(incorrectoSonido)
         vidas-=1
         if vidas==0:
             if cliente!=None:
@@ -361,9 +378,13 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
                 Finjuego(False,cliente,pal)
                 return
         elif vidas==1:
-            #Pista(pal)
-            pass
+            Pista(pal)
+            
     else:
+        cancionActual="correcto"
+        correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
+        if efectosSonido.get_busy()==False:
+            efectosSonido.play(correctoSonido)        
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
                 cliente.send("RESULT1".encode(FORMAT))
@@ -380,17 +401,25 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     letraEntrada.delete(0,END)
 #haz que aparezca una ventana emergente que te ponga la primera letra de la palabra a adivinar
 def Pista(pal):
-    messagebox.showinfo("","Pista: La primera letra de la palabra es: "+pal[0])
-    return
+    letrasrestantes=[]
+    for letra in range(0,len(pal)-1):
+        if Asterisca(pal,letrasdadas)[letra]=="*":
+            letrasrestantes.append(letra)
+    messagebox.showinfo("","Pista: La palabra contiene la letra: "+pal[random.choice(letrasrestantes)])
 def Finjuego(gana,cliente=None,pal=None):
     global efectosSonido
     global cancionActual
+    global vidas
     TkinterClear(root)
     root.geometry("400x300")
     if gana:
         ganaTitulo=Label(root,text="¡Has ganado!",font=("Times New Roman",30))
         ganaTitulo.config(fg="green")
         ganaTitulo.pack(pady=10)
+        if musica and cancionActual!="gameOver":
+            cancionActual="victoria"
+            victoriaSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\victoriaMusic.mp3")
+            efectosSonido.play(victoriaSonido)
     else:
         ganaTitulo=Label(root,text="¡Has perdido!",font=("Times New Roman",30))
         ganaTitulo.config(fg="red")
@@ -398,12 +427,19 @@ def Finjuego(gana,cliente=None,pal=None):
         if musica and cancionActual!="gameOver":
             cancionActual="gameOver"
             gameOverSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\gameOverMusic.mp3")
-            efectosSonido.play(gameOverSonido)
-    
+            efectosSonido.play(gameOverSonido)  
     if pal != None:
         palLabel=Label(root,text="La palabra era: "+pal,font=("Times New Roman",15))
         palLabel.pack(pady=5)
     if cliente!=None:
+        explainLabel=Label(root,text="",font=("Times New Roman",12))
+        if gana:
+            if Asterisca(pal,letrasdadas)!=pal:
+                explainLabel.config(text="¡El otro jugador se ha quedado sin vidas!")
+                explainLabel.pack(pady=5)
+        elif vidas>0:
+                explainLabel.config(text="¡El otro jugador ha adivinado la palabra!")
+                explainLabel.pack(pady=5)
         volverBoton=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
         volverBoton.pack(pady=10)
     else:
