@@ -6,6 +6,7 @@ except:
     import os,sys
     os.system("pip install pygame")
     print("Se han instalado las dependencias")
+    fin=input("Presiona enter para salir")
     sys.exit()
 #Para parar la conexión
 global stopRecv
@@ -108,9 +109,9 @@ def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offlin
         clockThread.start()   
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
-    botonOnline=Button(root,text="Iniciar partida online",command=ConectaAlServer)
+    botonOnline=Button(root,text="Iniciar partida online (2P)",command=ConectaAlServer)
     botonOnline.pack(pady=5)
-    botonOffline=Button(root,text="Iniciar partida offline",command=InicioOffline)
+    botonOffline=Button(root,text="Iniciar partida offline (1P)",command=InicioOffline)
     botonOffline.pack(pady=5)
     if colorclock:
         botonPausa=Button(root,text="Fondo de colores ON",command=lambda:PausaColor(root,botonPausa))
