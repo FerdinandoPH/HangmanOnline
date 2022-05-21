@@ -5,6 +5,7 @@ try:
 except:
     import os,sys
     os.system("pip install pygame")
+    os.system("pip3 install pygame")
     print("Se han instalado las dependencias")
     fin=input("Presiona enter para salir")
     sys.exit()
@@ -365,8 +366,6 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
                 Finjuego(True,cliente,pal)
                 return
     # Se actualiza la información del GUI
-    print(vidas)
-    print(FormatLetrasUsadas(letrasdadas))
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
     vidaLabel.config(text="Vidas: "+str(vidas))
     horcaLabel.config(image=imagenes[6-vidas])
