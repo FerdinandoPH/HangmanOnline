@@ -1,0 +1,8 @@
+MEJORAS REALIZADAS:
+
+- Las palabras se cargan de un archivo que contiene todas las palabras del diccionario (en vez de unas pocas palabras predeterminadas)
+- Se puede elegir la dificultad de la palabra en función de su longitud
+- Cuando queda una vida, el juego te da una pista, que te dice una de las palabras que aún no han sido descubiertas
+- Tiene efectos de sonido y música
+- La ventana cambia de color
+- Multijugador online, con servidor dedicado (en mi humilde opinión, debería contar más que como una simple mejora)

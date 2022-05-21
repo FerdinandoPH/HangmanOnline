@@ -34,14 +34,14 @@ server.bind(ADDR)
 conectados=[]
 conectadosaddr=[]
 partidas={}
-class Partida():
+class Partida(): #Atributos que tiene cada partida que se genera
     def __init__(self,id,difficulty,j1):
         self.id=id
         self.difficulty=difficulty
         self.j1=j1
         self.j2=None
         self.palabra=""
-def BorraTrazas(conn):
+def BorraTrazas(conn): #Cuando se cierra una conexion de forma abrupta, esta función se encarga de avisar al otro jugador y de borrar la partida
     for Partida in list(partidas.keys()):
         if partidas[Partida].j1==conn:
             if partidas[Partida].j2!=None:
@@ -57,7 +57,7 @@ def Stats():
     with pynput.keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 '''
-def start():
+def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas conexiones
     server.listen()
     while True:
         conn,addr=server.accept()
@@ -66,7 +66,7 @@ def start():
         thread=threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
         print(f"Conexiones activas: {len(conectados)}")
-def handle_client(conn, addr):
+def handle_client(conn, addr): #Hilo que se genera para cada conexión
     print(f"Nueva conexion de {addr}")
     conectado=True
     mode="Undef"
@@ -76,12 +76,12 @@ def handle_client(conn, addr):
             msg=conn.recv(2048).decode(FORMAT)
             if msg:
                 print("{} : {}".format(addr,msg))
-                if msg==TERMINATED:
+                if msg==TERMINATED: #Se cierra la conexión
                     conectado=False
-                elif msg==REMOTE_TERMINATED:
+                elif msg==REMOTE_TERMINATED: #El cliente ha solicitado cerrar la conexión por un error
                     conn.send(("ADIOS").encode(FORMAT))
                     conectado=False
-                elif msg[:6]=="SERVER":
+                elif msg[:6]=="SERVER": #Se ha solicitado que se genere una partida (el último caracter es la dificultad)
                     mode="Server"
                     darid=str(random.randint(1000,9999))
                     while darid in partidas.keys():
@@ -89,11 +89,11 @@ def handle_client(conn, addr):
                     partidas.update({darid:Partida(darid,int(msg[6:]),conn)})
                     gameId=darid
                     conn.send(("Partida"+str(darid)).encode(FORMAT))
-                elif msg[:6]=="CANCEL":
+                elif msg[:6]=="CANCEL": #Se ha solicitado cancelar una partida en espera al J2
                     if msg[6:] in partidas.keys():
                         del partidas[msg[6:]]
                         print(f"Partida {msg[6:]} cancelada")
-                elif msg[:6]=="CLIENT":
+                elif msg[:6]=="CLIENT": #Se ha solicitado unirse a una partida (se responde en función de si esa partida existe y no está en curso)
                     mode="Client"
                     idrequest=msg[6:]
                     if idrequest not in partidas.keys() or partidas[idrequest].j2!=None:
@@ -116,7 +116,7 @@ def handle_client(conn, addr):
                         partidas[idrequest].palabra=palabraAadivinar
                         conn.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
                         partidas[idrequest].j1.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
-                elif msg[:6]=="RESULT":
+                elif msg[:6]=="RESULT": #Uno de los jugadores ha ganado o se ha quedado sin vidas. Se avisa al otro jugador
                     resultado=msg[6:]
                     if resultado=="1":
                         if mode=="Server":
@@ -133,7 +133,7 @@ def handle_client(conn, addr):
                             partidas[gameId].j1.send(("RESULT1").encode(FORMAT))
                             partidas[gameId].j2.send(("RESULT0").encode(FORMAT))
 
-        except Exception as e:
+        except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa). Se procede a cerrar la conexión
             print("ERROR: ",e)
             conectado=False
     print(f"{addr} se ha desconectado")
@@ -143,6 +143,7 @@ def handle_client(conn, addr):
     conectados.remove(conn)
     print(f"Conexiones activas: {len(conectados)}")
 print("Servidor escuchando en:", SERVER, ":", PORT)
+'''
 def on_press(key):
     try:
         if key.char=='q':
@@ -150,6 +151,7 @@ def on_press(key):
             print("Conectados: ",conectadosaddr)
     except:
         pass
+    '''
 '''
 thread2=threading.Thread(target=Stats)
 thread2.start()

@@ -1,7 +1,23 @@
-import random,sys
+try:
+    import os, random, time,sys,unidecode
+except:
+    import os, random, time,sys
+    os.system("pip install unidecode")
+    print("Unidecode instalado. Reinicia el programa")
+    a=input("Pulsa enter para cerrar el programa")
+    sys.exit()
 wlist=[]
 letrasdadas=[]
-vidas=5
+vidas=6
+currdir=os.path.dirname(os.path.abspath(__file__))
+def CargaPalabras():
+    with open (currdir+"\\diccionario.txt", "r",encoding="utf-8") as f:
+        for line in f:
+            if "," in line:
+                line=line[:line.find(",")]
+            if line.isalpha() and len(line)>1:
+                wlist.append(unidecode.unidecode(line.strip()))
+        f.close()
 def Asterisca(pal):
     nuevapal=""
     for i in range (0,len(pal)):
@@ -11,17 +27,47 @@ def Asterisca(pal):
             nuevapal+=pal[i]
     return nuevapal
     
-def CargaPalabras():
-    with open ("diccionario.txt", "r",encoding="utf-8") as f:
-        for line in f:
-            if "," in line:
-                line=line[:line.find(",")]
-            if line.isalpha() and len(line)>1:
-                wlist.append(line.strip())
-        f.close()
 CargaPalabras()
-nombre=input("Escribe tu nombre: ")
-print("Hola",nombre," ,bienvenido al juego del ahorcado")
+HANGMAN_PICS = ['''
+  +---+
+      |
+      |
+      |
+     ===''', '''
+  +---+
+  O   |
+      |
+      |
+     ===''', '''
+  +---+
+  O   |
+  |   |
+      |
+     ===''', '''
+  +---+
+  O   |
+ /|   |
+      |
+     ===''', '''
+  +---+
+  O   |
+ /|\  |
+      |
+     ===''', '''
+  +---+
+  O   |
+ /|\  |
+ /    |
+     ===''', '''
+  +---+
+  O   |
+ /|\  |
+ / \  |
+     ===''']
+print("Bievenido al")
+print("*********************************************************")
+print("                 JUEGO DEL AHORCADO                      ")     
+print("*********************************************************")               
 print("¿Qué dificultad quieres?")
 print("1.Facil (hasta 5 letras)")
 print("2.Medio (hasta 9 letras)")
@@ -37,9 +83,12 @@ elif dificultad==2:
         palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
 else:
     palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
-print(Asterisca(palabraAadivinar))
-print("Tienes 5 vidas")
+print("Tienes 6 vidas")
 while vidas>0:
+    print(HANGMAN_PICS[6-vidas])
+    print("\n")
+    print("Palabra: ",Asterisca(palabraAadivinar))
+    print("Letras usadas: ",letrasdadas)
     letra=input("Escribe una letra: ")
     letra=letra.lower()
     if letra in letrasdadas:
@@ -49,19 +98,18 @@ while vidas>0:
             letrasdadas.append(letra)
             if letra in palabraAadivinar:
                 print("La letra",letra,"está en la palabra")
-                print(Asterisca(palabraAadivinar))
             else:
                 print("La letra",letra,"no está en la palabra")
                 vidas-=1
                 print("Te quedan",vidas,"vidas")
-                print(Asterisca(palabraAadivinar))
         else:
             print("Escribe una LETRA")
     if palabraAadivinar==Asterisca(palabraAadivinar):
+        print("¡Sí, la palabra era",palabraAadivinar,"!")
         print("Has ganado, ¡felicidades!")
         sys.exit()
+    time.sleep(0.5)
+print(HANGMAN_PICS[6])
 print("Lo siento, has perdido")
 print("La palabra era",palabraAadivinar)
-print("Suerte para la próxima!")
-
-            
+print("Suerte para la próxima!")                           

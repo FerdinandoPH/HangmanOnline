@@ -39,7 +39,8 @@ pygame.init()
 global efectosSonido
 pygame.mixer.set_num_channels(8)
 efectosSonido=pygame.mixer.Channel(0)
-def Asterisca(pal,letrasdadas):
+
+def Asterisca(pal,letrasdadas): #A partir de una palabra y una lista de letras usadas, devuelve la palabra con asteriscos en las posiciones donde se encuentran las letras que no se han usado
     nuevapal=""
     for i in range (0,len(pal)):
         if pal[i] not in letrasdadas:
@@ -47,10 +48,9 @@ def Asterisca(pal,letrasdadas):
         else:
             nuevapal+=pal[i]
     return nuevapal
-def TkinterClear(root,keepmusic=False,exceptosicancion=""):
+def TkinterClear(root,keepmusic=False,exceptosicancion=""): #Limpia todo el contenido de la ventana y para la canción actual a no ser que se indique lo contrario
     global cancionActual
     global efectosSonido
-    #Limpia la ventana de todos los objetos colocados con pack, place o grid
     if keepmusic==False and cancionActual!=exceptosicancion:
         pygame.mixer.music.stop()
         pygame.mixer.music.set_volume(1)
@@ -59,15 +59,9 @@ def TkinterClear(root,keepmusic=False,exceptosicancion=""):
     activos=root.pack_slaves()
     activos+=(root.place_slaves())
     activos+=(root.grid_slaves())
-    #print(activos)
     for widget in activos:
         widget.destroy()
-"""#haz un boton que pare la funcion reloj
-def Pausa():
-    global stopRecv
-    stopRecv=True
-    return"""
-def Pausa(root,boton=None):
+def PausaColor(root,boton=None): #Activa o desactiva el cambio de color de la ventana
     global colorclock
     if colorclock==True:
         colorclock=False
@@ -80,16 +74,16 @@ def Pausa(root,boton=None):
         clockThread=threading.Thread(target=ColorThread, args=(root,))
         clockThread.daemon=True
         clockThread.start()
-def ColorThread(raiz):
+def ColorThread(raiz): #Hilo que cambia el color de fondo de la ventana cada dos segundos
     global colorclock
     while colorclock:
         time.sleep(2)
-        Reloj(raiz)
+        ColorCambio(raiz)
     raiz.configure(background="white")
     for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label":
             widget.configure(background="white")
-def Reloj(raiz):
+def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiquetas a uno aleatorio
     color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     while color==raiz.cget("bg"):
         color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
@@ -97,13 +91,12 @@ def Reloj(raiz):
     for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
             widget.configure(background=color)
-def Inicio():
+def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
     global colorclock
     global musica
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("400x300")
-    #llama a la funcion reloj
     startclock=True
     for hilo in threading.enumerate():
         if "ColorThread" in hilo.name:
@@ -113,19 +106,16 @@ def Inicio():
         clockThread=threading.Thread(target=ColorThread, args=(root,))
         clockThread.daemon=True
         clockThread.start()   
-    #Haz un titulo que diga: Ahorcado, céntralo y ponlo grande
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
-    #Haz un boton que diga: Iniciar partida online
     botonOnline=Button(root,text="Iniciar partida online",command=ConectaAlServer)
     botonOnline.pack(pady=5)
-    #Haz un boton que diga: Iniciar partida offline a la derecha del boton anterior
     botonOffline=Button(root,text="Iniciar partida offline",command=InicioOffline)
     botonOffline.pack(pady=5)
     if colorclock:
-        botonPausa=Button(root,text="Fondo de colores ON",command=lambda:Pausa(root,botonPausa))
+        botonPausa=Button(root,text="Fondo de colores ON",command=lambda:PausaColor(root,botonPausa))
     else:
-        botonPausa=Button(root,text="Fondo de colores OFF",command=lambda:Pausa(root,botonPausa))
+        botonPausa=Button(root,text="Fondo de colores OFF",command=lambda:PausaColor(root,botonPausa))
     botonPausa.pack(pady=10)
     if musica:
         botonMusica=Button(root,text="Musica ON",command=lambda:CambiaMusica(botonMusica))
@@ -134,7 +124,7 @@ def Inicio():
     botonMusica.pack(pady=10)
     botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
     botonSalir.pack(pady=10)
-def CambiaMusica(boton=None):
+def CambiaMusica(boton=None): #Activa o desactiva la música
     global musica
     global cancionActual
     if musica==True:
@@ -147,7 +137,7 @@ def CambiaMusica(boton=None):
         if boton!=None:
             boton.config(text="Musica ON")
         
-def ConectaAlServer():
+def ConectaAlServer(): #Intenta conectarse al servidor, si no lo consigue, muestra un mensaje de error, si lo consigue, abre el hilo recv_thread (para comunicarse con el servidor) y va a InicioOnline
     global stopRecv
     stopRecv=False
     client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -160,7 +150,7 @@ def ConectaAlServer():
         InicioOnline(client)
     except:
         messagebox.showerror("","Parece que el servidor no funciona. Inténtalo más tarde")
-def InicioOnline(cliente):
+def InicioOnline(cliente): #Carga la pantalla de inicio online, con los botones para crear una partida o unirse a una ya creada y el botón de desconectarse
     global musica
     global cancionActual
     TkinterClear(root,False,"menu")
@@ -169,28 +159,26 @@ def InicioOnline(cliente):
         pygame.mixer.music.load(currdir+"\\Assets\\Musica\\menuMusic.mp3")
         pygame.mixer.music.play(-1)
     root.geometry("300x200")
-    #Haz un titulo que diga: Modo online, céntralo y ponlo grande
     tituloOnline=Label(root,text="Modo online",font=("Times New Roman",30))
     tituloOnline.pack(pady=10)
-    #Crea un botón para crear una partida y a la derecha un botón para unirse a una partida
     botonCrear=Button(root,text="Crear partida",command=lambda:CrearPartida(cliente))
     botonCrear.pack(pady=5)
     botonUnirse=Button(root,text="Unirse a partida",command=lambda:UnirsePartida(cliente))
     botonUnirse.pack(pady=5)
     botonSalir=Button(root,text="Desconectarse",command=lambda:[cliente.send("SEPPUKU".encode(FORMAT)),Inicio()])
     botonSalir.pack(pady=10)
-def FormatLetrasUsadas(letrasdadas):
+def FormatLetrasUsadas(letrasdadas): #Convierte la lista de letras usadas en una cadena que puede representarse en una etiqueta (más elegante)
     nuevapal="Letras usadas: "
     for i in range (0,len(letrasdadas)):
         nuevapal+=letrasdadas[i]
         if i!=len(letrasdadas)-1:
             nuevapal+=", "
     return nuevapal
-def CancelaPartida(cliente,id):
+def CancelaPartida(cliente,id): #Cancela la espera a otro jugador, y vuelve a la pantalla de inicio online
     cliente.send(("CANCEL"+str(id)).encode(FORMAT))
     print("Partida cancelada")
     InicioOnline(cliente)
-def recv_server(cliente):
+def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor y procesarlos
     '''
     global idpartida
     global mode
@@ -202,20 +190,17 @@ def recv_server(cliente):
     while stopRecv==False:
         try:
             msg=cliente.recv(2048).decode(FORMAT)
-            if msg:
-                #print(msg)
-                
-                if msg=="ADIOS":
+            if msg:    
+                if msg=="ADIOS": #Comienza la desconexión
                     stopRecv=True
-                elif msg=="Nohay":
+                elif msg=="Nohay": #La partida a la que se quiere unir no existe o ya está en curso
                     for widget in root.pack_slaves():
                         if widget.winfo_class()=="Label" and widget.cget("text")=="No existe esa partida o ya está en curso":
                             widget.destroy()
                     nohayLabel=Label(root,text="No existe esa partida o ya está en curso")
-                    #Pon el texto en rojo
                     nohayLabel.config(fg="red")
                     nohayLabel.pack(pady=10)
-                elif msg[:7]=="Partida":
+                elif msg[:7]=="Partida": #La partida se ha creado con éxito, y se da el id para que otro jugador pueda unirse
                     idpartida=msg[7:]
                     TkinterClear(root,True)
                     root.geometry("300x200")
@@ -227,41 +212,33 @@ def recv_server(cliente):
                     #Haz un boton que diga: Salir
                     botonSalir=Button(root,text="Cancelar",command=lambda:CancelaPartida(cliente,idpartida))
                     botonSalir.pack(pady=10)
-
-                
-                elif msg[:2]=="Ok":
+                elif msg[:2]=="Ok": #Ya hay dos jugadores, y se puede comenzar la partida. El servidor envía la palabra y comienza el juego
                     pal=msg[2:]
-                    Ahorcado(pal,cliente)
-                
-                elif msg=="Cerrada":
-                    #Pon un mensaje de error diciendo "El otro jugador ha abandonado la partida"
+                    Ahorcado(pal,cliente)     
+                elif msg=="Cerrada": #El otro jugador se ha desconectado en medio de la partida
                     messagebox.showerror("Error","El otro jugador ha abandonado la partida")
                     InicioOnline(cliente)
-                
-                elif msg[:6]=="RESULT":
+                elif msg[:6]=="RESULT": #Uno de los jugadores ha acertado la palabra o se ha quedado sin vidas
                     resultado=msg[6:]
                     if resultado=="1":
                         Finjuego(True,cliente,pal)
                     else:
                         Finjuego(False,cliente,pal)
-                    
-        except Exception as e:
+        except Exception as e: #Ha ocurrido un error, por lo que el hilo se cierra
             print("Se ha cerrado la conexión")
             print("El error ha sido: ",e)
             stopRecv=True
             break
     try:
-        cliente.send(TERMINATED.encode(FORMAT))
+        cliente.send(TERMINATED.encode(FORMAT)) #El hilo intenta avisar al servidor antes de cerrarse para que este se desconecte sin lanzar un error
     except:
-        print("Se ha intentado cerrar la conexión de forma limpia")
+        print("Se ha intentado cerrar la conexión de forma limpia") #Si no se puede, se ignora
     cliente.close()    
-def CrearPartida(cliente):
+def CrearPartida(cliente): #Pantalla para crear una partida online. Se especifica una dificultad y se manda al servidor para que cree la partida
     TkinterClear(root,True)
     root.geometry("400x300")
-    #Haz un titulo que diga: Elige dificultad, céntralo y ponlo grande
     tituloDificultad=Label(root,text="Elige dificultad",font=("Times New Roman",30))
     tituloDificultad.pack(pady=10)
-    #Haz tres botones: uno para facil (maximo 5 letras), otro para medio (maximo 9 letras) y uno para dificil (sin limite de letras). Debajo de los botones, introduce una etiquetaque explique cada dificultad. Debajo de la etiqueta, pon un botón para volver al menú anterior
     botonFacil=Button(root,text="Facil",command=lambda:cliente.send("SERVER1".encode(FORMAT)))
     botonFacil.pack(pady=5)
     botonMedio=Button(root,text="Medio",command=lambda:cliente.send("SERVER2".encode(FORMAT)))
@@ -272,29 +249,23 @@ def CrearPartida(cliente):
     explicacion.pack(pady=5)
     botonVolver=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
     botonVolver.pack(pady=10)
-
-
-def UnirsePartida(cliente):
+def UnirsePartida(cliente): #Pantalla para unirse a una partida online. Se manda el id de la partida al servidor para que este compruebe si se puede unir
     TkinterClear(root,True)
     root.geometry("400x300")
-    #Haz un titulo que diga: Unirse a una partida, céntralo y ponlo grande
     tituloUnirse=Label(root,text="Unirse a una partida",font=("Times New Roman",30))
     tituloUnirse.pack(pady=10)
     promptEntrada=Label(root,text="Introduce el id de la partida")
     promptEntrada.pack(pady=5)
     promptEntrada.focus_set()
-    #Haz una caja de texto para introducir el id de la partida
     idPartidaEntrada=Entry(root)
     idPartidaEntrada.pack(pady=5)
-    #Haz un boton para unirte a la partida
     botonUnirse=Button(root,text="Unirse",command=lambda:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
-    #Haz que también se envíe el id si se pulsa enter
     idPartidaEntrada.focus_set()
     idPartidaEntrada.bind("<Return>",lambda event:[cliente.send(("CLIENT"+idPartidaEntrada.get()).encode(FORMAT)),idPartidaEntrada.delete(0,END)])
     botonUnirse.pack(pady=10)
     botonVolver=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
     botonVolver.pack(pady=10)
-def Ahorcado(pal,cliente=None):
+def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de cada partida, y el argumento opcional "cliente" indica si se está jugando en modo online o no)
     global vidas
     global cancionActual
     vidas=6
@@ -311,11 +282,9 @@ def Ahorcado(pal,cliente=None):
     adivinaTitulo.pack(pady=10)
     palabraLabel=Label(root,text=Asterisca(pal,letrasdadas),font=("Times New Roman",15))
     palabraLabel.pack(pady=5)
-    #Haz una caja de texto para introducir la letra
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
-    #Haz un boton para introducir la letra
     botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
     botonLetra.pack(pady=10)
     letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
@@ -331,11 +300,11 @@ def Ahorcado(pal,cliente=None):
         botonVolver.pack(pady=10)
 
 
-def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente=None):
+def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente=None): #Se ejecuta cada vez que el usuario envía una letra
     global vidas
     global cancionActual
     global efectosSonido
-    if letra=="eumanito777":
+    if letra=="eumanito777": #Código debug para ganar
         for letra in pal:
             letrasdadas.append(letra)
         if cliente!=None:
@@ -344,7 +313,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         else:
             Finjuego(True,cliente,pal)
             return
-    if letra=="flamenc0":
+    if letra=="flamenc0": #Código debug para perder
         vidas=0
         if cliente!=None:
             cliente.send("RESULT0".encode(FORMAT))
@@ -352,6 +321,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         else:
             Finjuego(False,cliente,pal)
             return
+    #Se comprueba que la letra sea válida
     if len(letra)<1:
         messagebox.showerror("Error","Introduce alguna letra")
         return
@@ -364,6 +334,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         letraEntrada.delete(0,END)
         return
     letrasdadas.append(letra.lower())
+    #Ahora se comprueba si la letra está en la palabra o no
     if letra not in pal:
         cancionActual="incorrecto"
         incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
@@ -392,6 +363,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
             else:
                 Finjuego(True,cliente,pal)
                 return
+    # Se actualiza la información del GUI
     print(vidas)
     print(FormatLetrasUsadas(letrasdadas))
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
@@ -399,14 +371,13 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     horcaLabel.config(image=imagenes[6-vidas])
     letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
     letraEntrada.delete(0,END)
-#haz que aparezca una ventana emergente que te ponga la primera letra de la palabra a adivinar
-def Pista(pal):
+def Pista(pal): #Busca una palabra que no se haya dicho ya y la muestra
     letrasrestantes=[]
     for letra in range(0,len(pal)-1):
         if Asterisca(pal,letrasdadas)[letra]=="*":
             letrasrestantes.append(letra)
     messagebox.showinfo("","Pista: La palabra contiene la letra: "+pal[random.choice(letrasrestantes)])
-def Finjuego(gana,cliente=None,pal=None):
+def Finjuego(gana,cliente=None,pal=None): #Se ejecuta cuando el usuario ha ganado o perdido (gana=True si ha ganado)
     global efectosSonido
     global cancionActual
     global vidas
@@ -445,7 +416,7 @@ def Finjuego(gana,cliente=None,pal=None):
     else:
         volverBoton=Button(root,text="Volver",command=lambda:Inicio())
         volverBoton.pack(pady=10)
-def GeneraPalabra(dificultad):
+def GeneraPalabra(dificultad): #Genera una palabra aleatoria de la dificultad elegida para las partidas offline (en las online las palabras se generan en el servidor)
         if dificultad==1:
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
             while len(palabraAadivinar)>5:
@@ -457,7 +428,7 @@ def GeneraPalabra(dificultad):
         else:
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
         return palabraAadivinar
-def InicioOffline():
+def InicioOffline(): #Carga la pantalla para las partidas offline (muy parecido a la de crear partida, pero sin el servidor)
     global musica
     global cancionActual
     TkinterClear(root)
@@ -467,10 +438,8 @@ def InicioOffline():
         pygame.mixer.music.play(-1)
     root.geometry("400x300")
     CargaPalabras()
-    #Haz un titulo que diga: Elige dificultad, céntralo y ponlo grande
     tituloDificultad=Label(root,text="Elige dificultad",font=("Times New Roman",30))
     tituloDificultad.pack(pady=10)
-    #Haz tres botones: uno para facil (maximo 5 letras), otro para medio (maximo 9 letras) y uno para dificil (sin limite de letras). Debajo de los botones, introduce una etiquetaque explique cada dificultad. Debajo de la etiqueta, pon un botón para volver al menú anterior
     botonFacil=Button(root,text="Facil",command=lambda:Ahorcado(GeneraPalabra(1)))
     botonFacil.pack(pady=5)
     botonMedio=Button(root,text="Medio",command=lambda:Ahorcado(GeneraPalabra(2)))
@@ -481,7 +450,7 @@ def InicioOffline():
     explicacion.pack(pady=5)
     botonVolver=Button(root,text="Volver",command=lambda:Inicio())
     botonVolver.pack(pady=10)    
-def CargaPalabras():
+def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt" si se juega offline 
     try:
         with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
             for line in f:

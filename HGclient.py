@@ -1,3 +1,8 @@
+'''
+*****************
+VERSION ANTICUADA
+*****************
+
 try:
     import socket,threading,sys,pynput,time
 except:
@@ -183,3 +188,4 @@ def InicioOnline():
         print("Opcion invalida")
         client.send(("SEPPUKU").encode(FORMAT))
 Inicio()
+'''
