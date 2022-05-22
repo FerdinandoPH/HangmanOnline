@@ -367,7 +367,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     horcaLabel.config(image=imagenes[6-vidas])
     letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
     letraEntrada.delete(0,END)
-def Pista(pal): #Busca una palabra que no se haya dicho ya y la muestra
+def Pista(pal): #Busca una letra que no se haya dicho ya y la muestra
     letrasrestantes=[]
     for letra in range(0,len(pal)-1):
         if Asterisca(pal,letrasdadas)[letra]=="*":
