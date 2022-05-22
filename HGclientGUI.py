@@ -183,12 +183,6 @@ def CancelaPartida(cliente,id): #Cancela la espera a otro jugador, y vuelve a la
     print("Partida cancelada")
     InicioOnline(cliente)
 def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor y procesarlos
-    '''
-    global idpartida
-    global mode
-    global pal
-    global gameStatus
-    '''
     pal=""
     global stopRecv
     while stopRecv==False:
