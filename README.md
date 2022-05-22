@@ -9,7 +9,7 @@ HGClientGUI.py es el programa del cliente (diseñado para Windows, y el que te t
 
 La carpeta "assets" contiene los archivos de sonido, las imágenes, y el diccionario que usa el juego
 
-El archivo "autoevaluacion.txt" contiene todas las mejoras hechas al ahorcado original de moodle que usé como punto de partida del proyecto (que se encuentra en "base")
+El archivo "autoevaluacion.txt" contiene todas las mejoras hechas al ahorcado original de moodle dado como punto de partida del proyecto (se encuentra en "base")
 
 La carpeta "calentamiento" contiene los archivos "ahorcadov0.py", "ahorcadov1.py" y "ahorcadov2.py", que son versiones básicas del ahorcado que tuve que antes de empezar el proyecto.
 
@@ -25,7 +25,7 @@ HGClientGUI.py is the client program (designed for Windows, and the one you shou
 
 The assets folder contains the sound files, the images, and the dictionary that the game uses
 
-The text file "autoevaluacion.txt" contains all the improvements made from the original hangman that was used as a starting point of the project (located in "base")
+The text file "autoevaluacion.txt" contains all the improvements made from the original hangman that was meant as a starting point of the project (located in "base")
 
 The folder "calentamiento" contains the files "ahorcadov0.py", "ahorcadov1.py" and "ahorcadov2.py", which are basic hangman versions I had to do before starting the actual project.
 
