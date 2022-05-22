@@ -1,9 +1,8 @@
 import time
-nombre=input("como te llamas ")
-print("hola, "+nombre," es hora de jugar")
+nombre=input("¿Cómo te llamas? ")
+print("Hola, "+nombre," vamos a jugar al ahorcado")
 print(" ")
 time.sleep(1)
-print("comienza a adivinar")
 time.sleep(0.5)
 palabra="esternocleidomastoideo"
 tupalabra=" "
@@ -20,7 +19,7 @@ while vidas > 0:
     if fallos==0:
         input()
         print("")
-        print("felicidades, has ganado")
+        print("felicidades, has ganado!!")
         input()
         break
 
@@ -33,7 +32,4 @@ while vidas > 0:
         print("Te quedan ",+vidas," vidas")
     if vidas== 0:
         print("has perdido :(")
-else:
-    input()
-    print("gracias por participar")
-    input()
+

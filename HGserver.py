@@ -15,7 +15,7 @@ except:
 currdir=os.path.dirname(os.path.abspath(__file__))
 wlist=[]
 def CargaPalabras():
-    with open (currdir+"\\diccionario.txt", "r",encoding="utf-8") as f:
+    with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
         for line in f:
             if "," in line:
                 line=line[:line.find(",")]
