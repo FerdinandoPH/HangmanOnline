@@ -302,6 +302,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     global vidas
     global cancionActual
     global efectosSonido
+    global musica
     if letra=="eumanito777": #Código debug para ganar
         for letra in pal:
             letrasdadas.append(letra)
@@ -336,7 +337,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     if letra not in pal:
         cancionActual="incorrecto"
         incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
-        if efectosSonido.get_busy()==False:
+        if efectosSonido.get_busy()==False and musica:
             efectosSonido.play(incorrectoSonido)
         vidas-=1
         if vidas==0:
@@ -352,7 +353,7 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
     else:
         cancionActual="correcto"
         correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
-        if efectosSonido.get_busy()==False:
+        if efectosSonido.get_busy()==False and musica:
             efectosSonido.play(correctoSonido)        
         if Asterisca(pal,letrasdadas)==pal:
             if cliente!=None:
@@ -376,6 +377,7 @@ def Pista(pal): #Busca una letra que no se haya dicho ya y la muestra
 def Finjuego(gana,cliente=None,pal=None): #Se ejecuta cuando el usuario ha ganado o perdido (gana=True si ha ganado)
     global efectosSonido
     global cancionActual
+    global musica
     global vidas
     TkinterClear(root)
     root.geometry("400x300")
