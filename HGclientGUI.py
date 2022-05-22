@@ -7,6 +7,8 @@ except:
     os.system("pip install pygame")
     os.system("pip3 install pygame")
     print("Se han instalado las dependencias")
+    print("Cierra y abre el programa")
+    print("Si el problema persiste, asegúrate de que tienes python añadido al PATH")
     fin=input("Presiona enter para salir")
     sys.exit()
 #Para parar la conexión
