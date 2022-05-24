@@ -11,7 +11,6 @@ except:
     print("Si el problema persiste, asegúrate de que tienes python añadido al PATH")
     fin=input("Presiona enter para salir")
     sys.exit()
-#Para parar la conexión
 global stopRecv
 global colorclock
 colorclock=False
