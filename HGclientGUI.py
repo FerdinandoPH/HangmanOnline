@@ -93,8 +93,11 @@ def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiqueta
         color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
     for widget in raiz.pack_slaves():
-        if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
-            widget.configure(background=color)
+        try:
+            if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
+                widget.configure(background=color)
+        except:
+            pass
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
     global colorclock
     global musica
