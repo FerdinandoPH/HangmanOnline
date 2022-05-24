@@ -91,27 +91,18 @@ def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiqueta
     while color==raiz.cget("bg"):
         color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
-    for widget in raiz.pack_slaves():
-        try:
-            if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
+    try:
+        for widget in raiz.pack_slaves():
+            if widget.winfo_class()=="Label" and widget.cget("fg")!="red":
                 widget.configure(background=color)
-        except:
-            pass
+    except:
+        pass
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
     global colorclock
     global musica
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("400x300")
-    startclock=True
-    for hilo in threading.enumerate():
-        if "ColorThread" in hilo.name:
-            startclock=False
-            break
-    if startclock and colorclock:
-        clockThread=threading.Thread(target=ColorThread, args=(root,))
-        clockThread.daemon=True
-        clockThread.start()   
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
     botonOnline=Button(root,text="Iniciar partida online (2P)",command=ConectaAlServer)
