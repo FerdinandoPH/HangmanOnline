@@ -131,6 +131,9 @@ def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offlin
     botonMusica.pack(pady=10)
     botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
     botonSalir.pack(pady=10)
+    if os.path.isdir(currdir+"\\Assets")==False:
+        messagebox.showerror("Error","No se encuentra la carpeta Assets. Coloca la carpeta Assets en la misma carpeta que el juego")
+        root.destroy()
 def CambiaMusica(boton=None): #Activa o desactiva la música
     global musica
     global cancionActual
