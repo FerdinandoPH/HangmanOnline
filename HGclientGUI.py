@@ -11,7 +11,6 @@ except:
     print("Si el problema persiste, asegúrate de que tienes python añadido al PATH")
     fin=input("Presiona enter para salir")
     sys.exit()
-#Para parar la conexión
 global stopRecv
 global colorclock
 colorclock=False
@@ -92,24 +91,18 @@ def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiqueta
     while color==raiz.cget("bg"):
         color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
-    for widget in raiz.pack_slaves():
-        if widget.winfo_class()=="Label" and "Vidas" not in widget.cget("text"):
-            widget.configure(background=color)
+    try:
+        for widget in raiz.pack_slaves():
+            if widget.winfo_class()=="Label" and widget.cget("fg")!="red":
+                widget.configure(background=color)
+    except:
+        pass
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
     global colorclock
     global musica
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("400x300")
-    startclock=True
-    for hilo in threading.enumerate():
-        if "ColorThread" in hilo.name:
-            startclock=False
-            break
-    if startclock and colorclock:
-        clockThread=threading.Thread(target=ColorThread, args=(root,))
-        clockThread.daemon=True
-        clockThread.start()   
     titulo=Label(root,text="Ahorcado",font=("Times New Roman",30))
     titulo.pack(pady=10)
     botonOnline=Button(root,text="Iniciar partida online (2P)",command=ConectaAlServer)
@@ -128,6 +121,9 @@ def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offlin
     botonMusica.pack(pady=10)
     botonSalir=Button(root,text="Salir",command=lambda:root.destroy())
     botonSalir.pack(pady=10)
+    if os.path.isdir(currdir+"\\Assets")==False:
+        messagebox.showerror("Error","No se encuentra la carpeta Assets. Coloca la carpeta Assets en la misma carpeta que el juego")
+        root.destroy()
 def CambiaMusica(boton=None): #Activa o desactiva la música
     global musica
     global cancionActual
