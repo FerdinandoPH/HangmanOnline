@@ -1,28 +1,27 @@
 #!/usr/bin/env python3
-try:
-    import socket,threading,random,os,sys,unidecode
-    #import pynput
-except:
-    import os,sys
-    os.system("pip install unidecode")
-    print("Unidecode instalado. Reinicia el programa")
-    '''
-    os.system("pip install pynput")
-    print("Keyboard instalado. Reinicia el programa")
-    '''
-    a=input("Pulsa enter para cerrar el programa")
-    sys.exit()
+
+import socket,threading,random,os,sys
+#import pynput
+
 currdir=os.path.dirname(os.path.abspath(__file__))
 wlist=[]
-def CargaPalabras():
-    with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
-        for line in f:
-            if "," in line:
-                line=line[:line.find(",")]
-            if line.isalpha() and len(line)>1:
-                wlist.append(unidecode.unidecode(line.strip()))
-        f.close()
-CargaPalabras()
+def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt" si se juega offline 
+    try:
+        with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
+            for line in f:
+                if "," in line:
+                    line=line[:line.find(",")]
+                if line.isalpha() and len(line)>1:
+                    line=line.replace('á','a')
+                    line=line.replace('é','e')
+                    line=line.replace('í','i')
+                    line=line.replace('ó','o')
+                    line=line.replace('ú','u')
+                    line=line.replace('ü','u')
+                    wlist.append(line.strip())
+            f.close()
+    except:
+        print("No se ha podido cargar la lista de palabras. Comprueba que el archivo diccionario.txt esté en la carpeta del programa")
 PORT=1234
 SERVER=socket.gethostbyname(socket.gethostname())
 ADDR=(SERVER, PORT)
