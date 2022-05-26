@@ -218,7 +218,10 @@ def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor 
                     progreso=msg[4:]
                     for widget in root.pack_slaves():
                         if widget.winfo_class()=="Label" and "Al otro" in widget.cget("text"):
-                            widget.config(text="Al otro jugador le faltan "+progreso+" letras")
+                            if progreso!="1":
+                                widget.config(text="Al otro jugador le faltan "+progreso+" letras")
+                            else:
+                                widget.config(text="Al otro jugador le falta 1 letra")
                 elif msg[:6]=="RESULT": #Uno de los jugadores ha acertado la palabra o se ha quedado sin vidas
                     resultado=msg[6:]
                     if resultado=="1":
@@ -301,7 +304,7 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     letrasusadasLabel=Label(root,text=FormatLetrasUsadas(letrasdadas))
     letrasusadasLabel.pack(pady=5)
     if cliente!=None:
-        progLabel=Label(root,text="Al otro jugador le faltan: "+str(len(pal))+" letras",font=("Times New Roman",8))
+        progLabel=Label(root,text="Al otro jugador le faltan: "+str(len(pal))+" letras",font=("Times New Roman",9))
         progLabel.pack(pady=5)
     botonTeLaJuegas.pack(pady=10)
     if cliente==None:
