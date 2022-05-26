@@ -408,11 +408,11 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
                 Finjuego(True,cliente,pal)
                 return
         elif cliente!=None:
-            adivinadas=0
+            noadivinadas=0
             for letra in Asterisca(pal,letrasdadas):
-                if letra!="*":
-                    adivinadas+=1
-            cliente.send(("PROG"+str(len(pal)-adivinadas)).encode(FORMAT))
+                if letra=="*":
+                    noadivinadas+=1
+            cliente.send(("PROG"+str(noadivinadas)).encode(FORMAT))
     # Se actualiza la información del GUI
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
     vidaLabel.config(text="Vidas: "+str(vidas))
