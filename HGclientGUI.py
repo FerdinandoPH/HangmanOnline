@@ -214,7 +214,7 @@ def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor 
                 elif msg=="Cerrada": #El otro jugador se ha desconectado en medio de la partida
                     messagebox.showerror("Error","El otro jugador ha abandonado la partida")
                     InicioOnline(cliente)
-                elif msg[:4]=="PROG":
+                elif msg[:4]=="PROG": #El servidor envía cuántas letras le quedan al otro jugador
                     progreso=msg[4:]
                     for widget in root.pack_slaves():
                         if widget.winfo_class()=="Label" and "Al otro" in widget.cget("text"):

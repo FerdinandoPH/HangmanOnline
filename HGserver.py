@@ -119,7 +119,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                         partidas[idrequest].palabra=palabraAadivinar
                         conn.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
                         partidas[idrequest].j1.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
-                elif msg[:4]=="PROG":
+                elif msg[:4]=="PROG": #El servidor envía cuántas letras le quedan al otro jugador
                     progreso=msg[4:]
                     if mode=="Server":
                         partidas[gameId].j2.send(("PROG"+progreso).encode(FORMAT))
