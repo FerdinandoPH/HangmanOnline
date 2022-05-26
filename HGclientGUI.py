@@ -89,16 +89,18 @@ def ColorThread(raiz): #Hilo que cambia el color de fondo de la ventana cada dos
         if widget.winfo_class()=="Label":
             widget.configure(background="#f0f0f0")
 def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiquetas a uno aleatorio
-    color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
+    color=random.choice(["#ff8f05","#00ff00","#ffff00","#00ffff","#ff00ff"])
     while color==raiz.cget("bg"):
-        color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
+        color=random.choice(["#ff8f05","#00ff00","#ffff00","#00ffff","#ff00ff"])
     raiz.configure(background=color)
     try:
         for widget in raiz.pack_slaves():
-            if widget.winfo_class()=="Label" and widget.cget("fg")!="red":
+            if widget.winfo_class()=="Label": #and widget.cget("fg")!="red":
                 widget.configure(background=color)
-            elif widget.winfo_class()=="Label" and widget.cget("fg")=="red":
+                '''
+            elif widget.winfo_class()=="Label"and widget.cget("fg")=="red":
                 widget.configure(background="#f0f0f0")
+                '''
     except:
         pass
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
@@ -279,7 +281,7 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     risk=False
     vidas=6
     letrasdadas.clear()
-    print(len(pal))
+    #print(len(pal))
     TkinterClear(root)
     if musica and cancionActual!="main":
         cancionActual="main"
