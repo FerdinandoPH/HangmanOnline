@@ -3,9 +3,13 @@ MEJORAS REALIZADAS:
 - Las palabras se cargan de un archivo que contiene todas las palabras del diccionario (en vez de unas pocas palabras predeterminadas)
 - Se puede elegir la dificultad de la palabra en función de su longitud
 - Se comprueba que no puedas poner nada que no sea una letra
+- Opción "te la juegas" (si tienes más de dos vidas, puedes intentar adivinar la palabra entera de una vez, pero si fallas, pierdes inmediatamente)
 - Códigos secretos para ganar o perder
 - Cuando queda una vida, el juego te da una pista, que te dice una de las palabras que aún no han sido descubiertas
 - Tiene efectos de sonido y música (idea patentada)
 - Botones para activar/desactivar la música
 - La ventana cambia de color
 - Multijugador online, con servidor dedicado (en mi humilde opinión, debería contar más que como una simple mejora)
+    - Se generan partidas de dos con dificultad seleccionable utilizando un código de 4 cifras, permitiendo 9000 partidas a la vez (teóricamente)
+    - Es una partida a contrarreloj: ambos jugadores tienen que adivinar la misma palabra, si un jugador la adivina o se queda sin vidas, la partida acaba
+
