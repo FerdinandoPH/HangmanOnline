@@ -64,6 +64,7 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
         conectados.append(conn)
         conectadosaddr.append(addr)
         thread=threading.Thread(target=handle_client, args=(conn, addr))
+        thread.daemon=True
         thread.start()
         print(f"Conexiones activas: {len(conectados)}")
 def handle_client(conn, addr): #Hilo que se genera para cada conexión

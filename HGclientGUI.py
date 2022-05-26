@@ -288,9 +288,6 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
-    if cliente!=None:
-        progLabel=Label(root,text="Al otro jugador le faltan: "+str(len(pal))+" letras",font=("Times New Roman",15))
-        progLabel.pack(pady=5)
     botonTeLaJuegas=Button(root,text="Te la juegas",command=lambda:TeLaJuegas(vidaLabel,botonTeLaJuegas))
     botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente))
     botonLetra.pack(pady=10)
@@ -302,6 +299,9 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     vidaLabel.pack(pady=5)
     letrasusadasLabel=Label(root,text=FormatLetrasUsadas(letrasdadas))
     letrasusadasLabel.pack(pady=5)
+    if cliente!=None:
+        progLabel=Label(root,text="Al otro jugador le faltan: "+str(len(pal))+" letras",font=("Times New Roman",8))
+        progLabel.pack(pady=5)
     botonTeLaJuegas.pack(pady=10)
     if cliente==None:
         botonVolver=Button(root,text="Salir",command=lambda:Inicio())
@@ -407,6 +407,12 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
             else:
                 Finjuego(True,cliente,pal)
                 return
+        elif cliente!=None:
+            adivinadas=0
+            for letra in Asterisca(pal,letrasdadas):
+                if letra!="*":
+                    adivinadas+=1
+            cliente.send(("PROG"+str(len(pal)-adivinadas)).encode(FORMAT))
     # Se actualiza la información del GUI
     palabraLabel.config(text=Asterisca(pal,letrasdadas))
     vidaLabel.config(text="Vidas: "+str(vidas))
