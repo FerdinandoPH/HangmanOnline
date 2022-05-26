@@ -97,6 +97,8 @@ def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiqueta
         for widget in raiz.pack_slaves():
             if widget.winfo_class()=="Label" and widget.cget("fg")!="red":
                 widget.configure(background=color)
+            elif widget.winfo_class()=="Label" and widget.cget("fg")=="red":
+                widget.configure(background="#f0f0f0")
     except:
         pass
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
@@ -222,6 +224,7 @@ def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor 
                                 widget.config(text="Al otro jugador le faltan "+progreso+" letras")
                             else:
                                 widget.config(text="Al otro jugador le falta 1 letra")
+                                widget.config(fg="red")
                 elif msg[:6]=="RESULT": #Uno de los jugadores ha acertado la palabra o se ha quedado sin vidas
                     resultado=msg[6:]
                     if resultado=="1":
