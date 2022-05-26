@@ -5,7 +5,7 @@ import socket,threading,random,os,sys
 
 currdir=os.path.dirname(os.path.abspath(__file__))
 wlist=[]
-def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt" si se juega offline 
+def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt" 
     try:
         with open (currdir+"/Assets/diccionario.txt", "r",encoding="utf-8") as f:
             for line in f:
@@ -33,6 +33,7 @@ server.bind(ADDR)
 conectados=[]
 conectadosaddr=[]
 partidas={}
+CargaPalabras()
 class Partida(): #Atributos que tiene cada partida que se genera
     def __init__(self,id,difficulty,j1):
         self.id=id
