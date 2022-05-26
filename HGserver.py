@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket,threading,random,os,sys
+import socket,threading,random,os,sys,time
 #import pynput
 
 currdir=os.path.dirname(os.path.abspath(__file__))
@@ -141,6 +141,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                         else:
                             partidas[gameId].j1.send(("RESULT1").encode(FORMAT))
                             partidas[gameId].j2.send(("RESULT0").encode(FORMAT))
+                    time.sleep(0.1)
                     del partidas[gameId]
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa). Se procede a cerrar la conexión
             print("ERROR: ",e)
