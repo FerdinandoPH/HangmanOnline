@@ -63,7 +63,6 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
         conectados.append(conn)
         conectadosaddr.append(addr)
         thread=threading.Thread(target=handle_client, args=(conn, addr))
-        thread.daemon=True
         thread.start()
         print(f"Conexiones activas: {len(conectados)}")
 def handle_client(conn, addr): #Hilo que se genera para cada conexión
@@ -102,17 +101,17 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                         partidas[idrequest].j2=conn
                         dificultad=partidas[idrequest].difficulty
                         if dificultad==1:
-                            palabraAadivinar=random.choice(wlist)
+                            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                             while len(palabraAadivinar)>5:
-                                palabraAadivinar=random.choice(wlist)
+                                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         elif dificultad==2:
-                            palabraAadivinar=random.choice(wlist)
-                            while len(palabraAadivinar)>9 and len(palabraAadivinar)<=5:
-                                palabraAadivinar=random.choice(wlist)
+                            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+                            while len(palabraAadivinar)>9 or len(palabraAadivinar)<6:
+                                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         else:
-                            palabraAadivinar=random.choice(wlist)
-                            while len(palabraAadivinar)<9:
-                                palabraAadivinar=random.choice(wlist)
+                            palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+                            while len(palabraAadivinar)>9:
+                                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         print("Palabra a adivinar: ",palabraAadivinar)
                         gameId=idrequest
                         partidas[idrequest].palabra=palabraAadivinar
