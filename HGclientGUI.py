@@ -246,7 +246,7 @@ def CrearPartida(cliente): #Pantalla para crear una partida online. Se especific
     botonMedio.pack(pady=5)
     botonDificil=Button(root,text="Dificil",command=lambda:cliente.send("SERVER3".encode(FORMAT)))
     botonDificil.pack(pady=5)
-    explicacion=Label(root,text="Fácil: 5 letras.\nMedio: 9 letras.\nDificil: Sin limite de letras")
+    explicacion=Label(root,text="Fácil: hasta 5 letras.\nMedio: de 6 a 9 letras.\nDifícil: Sin limite de letras")
     explicacion.pack(pady=5)
     botonVolver=Button(root,text="Volver",command=lambda:InicioOnline(cliente))
     botonVolver.pack(pady=10)
@@ -273,6 +273,7 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     risk=False
     vidas=6
     letrasdadas.clear()
+    print(len(pal))
     TkinterClear(root)
     if musica and cancionActual!="main":
         cancionActual="main"
@@ -472,7 +473,7 @@ def GeneraPalabra(dificultad): #Genera una palabra aleatoria de la dificultad el
                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
         elif dificultad==2:
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
-            while len(palabraAadivinar)>9:
+            while len(palabraAadivinar)>9 or len(palabraAadivinar)<6:
                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
         else:
             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
@@ -495,7 +496,7 @@ def InicioOffline(): #Carga la pantalla para las partidas offline (muy parecido 
     botonMedio.pack(pady=5)
     botonDificil=Button(root,text="Dificil",command=lambda:Ahorcado(GeneraPalabra(3)))
     botonDificil.pack(pady=5)
-    explicacion=Label(root,text="Fácil: 5 letras.\nMedio: 9 letras.\nDificil: Sin limite de letras")
+    explicacion=Label(root,text="Fácil: hasta 5 letras.\nMedio: de 6 a 9 letras.\nDifícil: Sin limite de letras")
     explicacion.pack(pady=5)
     botonVolver=Button(root,text="Volver",command=lambda:Inicio())
     botonVolver.pack(pady=10)    
