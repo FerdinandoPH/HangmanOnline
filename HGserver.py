@@ -7,7 +7,7 @@ currdir=os.path.dirname(os.path.abspath(__file__))
 wlist=[]
 def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt" si se juega offline 
     try:
-        with open (currdir+"\\Assets\\diccionario.txt", "r",encoding="utf-8") as f:
+        with open (currdir+"/Assets/diccionario.txt", "r",encoding="utf-8") as f:
             for line in f:
                 if "," in line:
                     line=line[:line.find(",")]
@@ -22,8 +22,8 @@ def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt"
             f.close()
     except:
         print("No se ha podido cargar la lista de palabras. Comprueba que el archivo diccionario.txt esté en la carpeta del programa")
-PORT=1234
-SERVER=socket.gethostbyname(socket.gethostname())
+PORT=44444
+SERVER="192.168.1.3"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
@@ -106,15 +106,23 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         elif dificultad==2:
                             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
-                            while len(palabraAadivinar)>9:
+                            while len(palabraAadivinar)>9 and len(palabraAadivinar)<=5:
                                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         else:
                             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
+                            while len(palabraAadivinar)<9:
+                                palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         print("Palabra a adivinar: ",palabraAadivinar)
                         gameId=idrequest
                         partidas[idrequest].palabra=palabraAadivinar
                         conn.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
                         partidas[idrequest].j1.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
+                elif msg[:4]=="PROG":
+                    progreso=msg[4:]
+                    if mode=="Server":
+                        partidas[gameId].j2.send(("PROG"+progreso).encode(FORMAT))
+                    elif mode=="Client":
+                        partidas[gameId].j1.send(("PROG"+progreso).encode(FORMAT))
                 elif msg[:6]=="RESULT": #Uno de los jugadores ha ganado o se ha quedado sin vidas. Se avisa al otro jugador
                     resultado=msg[6:]
                     if resultado=="1":
@@ -131,7 +139,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                         else:
                             partidas[gameId].j1.send(("RESULT1").encode(FORMAT))
                             partidas[gameId].j2.send(("RESULT0").encode(FORMAT))
-
+                    del partidas[gameId]
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa). Se procede a cerrar la conexión
             print("ERROR: ",e)
             conectado=False

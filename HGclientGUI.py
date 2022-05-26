@@ -214,6 +214,11 @@ def recv_server(cliente): #Hilo que se encarga de recibir mensajes del servidor 
                 elif msg=="Cerrada": #El otro jugador se ha desconectado en medio de la partida
                     messagebox.showerror("Error","El otro jugador ha abandonado la partida")
                     InicioOnline(cliente)
+                elif msg[:4]=="PROG":
+                    progreso=msg[4:]
+                    for widget in root.pack_slaves():
+                        if widget.winfo_class()=="Label" and "Al otro" in widget.cget("text"):
+                            widget.config(text="Al otro jugador le faltan "+progreso+" letras")
                 elif msg[:6]=="RESULT": #Uno de los jugadores ha acertado la palabra o se ha quedado sin vidas
                     resultado=msg[6:]
                     if resultado=="1":
@@ -283,6 +288,8 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
+    if cliente!=None:
+        progLabel=Label(root,text="Al otro jugador le faltan: "+len(pal)+" letras",font=("Times New Roman",15))
     botonTeLaJuegas=Button(root,text="Te la juegas",command=lambda:TeLaJuegas(vidaLabel,botonTeLaJuegas))
     botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente))
     botonLetra.pack(pady=10)
@@ -304,10 +311,16 @@ def TeLaJuegas(vidaLabel,botonTeLaJuegas): #Pantalla de "Te la juegas" (se carga
     global risk
     confirmar=messagebox.askyesno("Advertencia","Adivina la palabra de una\nSi fallas, perderás directamente\n¿Quieres continuar?")
     if confirmar:
-        risk=True
-        vidas=1
-        vidaLabel.configure(text="TE LA JUEGAS")
-        botonTeLaJuegas.pack_forget()
+        sigueEnJuego=False
+        for widget in root.pack_slaves():
+            if widget==vidaLabel:
+                sigueEnJuego=True
+                break
+        if sigueEnJuego:
+            risk=True
+            vidas=1
+            vidaLabel.configure(text="TE LA JUEGAS")
+            botonTeLaJuegas.pack_forget()
 
 def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente=None): #Se ejecuta cada vez que el usuario envía una letra
     global vidas
@@ -332,6 +345,10 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         else:
             Finjuego(False,cliente,pal)
             return
+    #Se comprueba que la letra sea válida
+    if len(letra)<1:
+        messagebox.showerror("Error","Introduce alguna letra")
+        return
     if risk:
         if letra==pal:
             for letra in pal:
@@ -350,56 +367,51 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
             else:
                 Finjuego(False,cliente,pal)
                 return
-    else:
-        #Se comprueba que la letra sea válida
-        if len(letra)<1:
-            messagebox.showerror("Error","Introduce alguna letra")
-            return
-        if len(letra)>1 or not(letra.isalpha()):
-            messagebox.showerror("Error","Introduce una sola letra")
-            letraEntrada.delete(0,END)
-            return
-        if letra in letrasdadas:
-            messagebox.showinfo("","Ya has introducido esa letra")
-            letraEntrada.delete(0,END)
-            return
-        letrasdadas.append(letra.lower())
-        #Ahora se comprueba si la letra está en la palabra o no
-        if letra not in pal:
-            cancionActual="incorrecto"
-            incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
-            if efectosSonido.get_busy()==False and musica:
-                efectosSonido.play(incorrectoSonido)
-            vidas-=1
-            if vidas==0:
-                if cliente!=None:
-                    cliente.send("RESULT0".encode(FORMAT))
-                    return
-                else:
-                    Finjuego(False,cliente,pal)
-                    return
-            elif vidas==1:
-                Pista(pal)
-            elif vidas<=2:
-                botonTeLaJuegas.pack_forget()
-        else:
-            cancionActual="correcto"
-            correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
-            if efectosSonido.get_busy()==False and musica:
-                efectosSonido.play(correctoSonido)        
-            if Asterisca(pal,letrasdadas)==pal:
-                if cliente!=None:
-                    cliente.send("RESULT1".encode(FORMAT))
-                    return
-                else:
-                    Finjuego(True,cliente,pal)
-                    return
-        # Se actualiza la información del GUI
-        palabraLabel.config(text=Asterisca(pal,letrasdadas))
-        vidaLabel.config(text="Vidas: "+str(vidas))
-        horcaLabel.config(image=imagenes[6-vidas])
-        letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
+    if len(letra)>1 or not(letra.isalpha()):
+        messagebox.showerror("Error","Introduce una sola letra")
         letraEntrada.delete(0,END)
+        return
+    if letra in letrasdadas:
+        messagebox.showinfo("","Ya has introducido esa letra")
+        letraEntrada.delete(0,END)
+        return
+    letrasdadas.append(letra.lower())
+    #Ahora se comprueba si la letra está en la palabra o no
+    if letra not in pal:
+        cancionActual="incorrecto"
+        incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
+        if efectosSonido.get_busy()==False and musica:
+            efectosSonido.play(incorrectoSonido)
+        vidas-=1
+        if vidas==0:
+            if cliente!=None:
+                cliente.send("RESULT0".encode(FORMAT))
+                return
+            else:
+                Finjuego(False,cliente,pal)
+                return
+        elif vidas==1:
+            Pista(pal)
+        elif vidas<=2:
+            botonTeLaJuegas.pack_forget()
+    else:
+        cancionActual="correcto"
+        correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
+        if efectosSonido.get_busy()==False and musica:
+            efectosSonido.play(correctoSonido)        
+        if Asterisca(pal,letrasdadas)==pal:
+            if cliente!=None:
+                cliente.send("RESULT1".encode(FORMAT))
+                return
+            else:
+                Finjuego(True,cliente,pal)
+                return
+    # Se actualiza la información del GUI
+    palabraLabel.config(text=Asterisca(pal,letrasdadas))
+    vidaLabel.config(text="Vidas: "+str(vidas))
+    horcaLabel.config(image=imagenes[6-vidas])
+    letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
+    letraEntrada.delete(0,END)
 def Pista(pal): #Busca una letra que no se haya dicho ya y la muestra
     letrasrestantes=[]
     for letra in range(0,len(pal)-1):
