@@ -16,6 +16,8 @@ global colorclock
 colorclock=False
 global musica
 musica=True
+global risk
+risk=False
 global cancionActual
 cancionActual=""
 stopRecv=False
@@ -82,10 +84,10 @@ def ColorThread(raiz): #Hilo que cambia el color de fondo de la ventana cada dos
     while colorclock:
         time.sleep(2)
         ColorCambio(raiz)
-    raiz.configure(background="white")
+    raiz.configure(background="#f0f0f0")
     for widget in raiz.pack_slaves():
         if widget.winfo_class()=="Label":
-            widget.configure(background="white")
+            widget.configure(background="#f0f0f0")
 def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiquetas a uno aleatorio
     color=random.choice(["#ff323b","#00ff00","#ffff00","#00ffff","#ff00ff"])
     while color==raiz.cget("bg"):
@@ -262,6 +264,8 @@ def UnirsePartida(cliente): #Pantalla para unirse a una partida online. Se manda
 def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de cada partida, y el argumento opcional "cliente" indica si se está jugando en modo online o no)
     global vidas
     global cancionActual
+    global risk
+    risk=False
     vidas=6
     letrasdadas.clear()
     TkinterClear(root)
@@ -279,9 +283,10 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     letraEntrada=Entry(root)
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
-    botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
+    botonTeLaJuegas=Button(root,text="Te la juegas",command=lambda:TeLaJuegas(vidaLabel,botonTeLaJuegas))
+    botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente))
     botonLetra.pack(pady=10)
-    letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente))
+    letraEntrada.bind("<Return>",lambda event:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente))
     horcaLabel=Label(root,image=imagenes[6-vidas])
     horcaLabel.pack(pady=5)
     vidaLabel=Label(root,text="Vidas: "+str(vidas))
@@ -289,16 +294,27 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     vidaLabel.pack(pady=5)
     letrasusadasLabel=Label(root,text=FormatLetrasUsadas(letrasdadas))
     letrasusadasLabel.pack(pady=5)
+    botonTeLaJuegas.pack(pady=10)
     if cliente==None:
         botonVolver=Button(root,text="Salir",command=lambda:Inicio())
         botonVolver.pack(pady=10)
 
+def TeLaJuegas(vidaLabel,botonTeLaJuegas): #Pantalla de "Te la juegas" (se carga al principio de cada partida)
+    global vidas
+    global risk
+    confirmar=messagebox.askyesno("Advertencia","Adivina la palabra de una\nSi fallas, perderás directamente\n¿Quieres continuar?")
+    if confirmar:
+        risk=True
+        vidas=1
+        vidaLabel.configure(text="TE LA JUEGAS")
+        botonTeLaJuegas.pack_forget()
 
-def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,cliente=None): #Se ejecuta cada vez que el usuario envía una letra
+def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente=None): #Se ejecuta cada vez que el usuario envía una letra
     global vidas
     global cancionActual
     global efectosSonido
     global musica
+    global risk
     if letra=="eumanito777": #Código debug para ganar
         for letra in pal:
             letrasdadas.append(letra)
@@ -316,54 +332,74 @@ def ProcesaLetra(pal,letra,letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,
         else:
             Finjuego(False,cliente,pal)
             return
-    #Se comprueba que la letra sea válida
-    if len(letra)<1:
-        messagebox.showerror("Error","Introduce alguna letra")
-        return
-    if len(letra)>1 or not(letra.isalpha()):
-        messagebox.showerror("Error","Introduce una sola letra")
-        letraEntrada.delete(0,END)
-        return
-    if letra in letrasdadas:
-        messagebox.showinfo("","Ya has introducido esa letra")
-        letraEntrada.delete(0,END)
-        return
-    letrasdadas.append(letra.lower())
-    #Ahora se comprueba si la letra está en la palabra o no
-    if letra not in pal:
-        cancionActual="incorrecto"
-        incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
-        if efectosSonido.get_busy()==False and musica:
-            efectosSonido.play(incorrectoSonido)
-        vidas-=1
-        if vidas==0:
-            if cliente!=None:
-                cliente.send("RESULT0".encode(FORMAT))
-                return
-            else:
-                Finjuego(False,cliente,pal)
-                return
-        elif vidas==1:
-            Pista(pal)
-            
-    else:
-        cancionActual="correcto"
-        correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
-        if efectosSonido.get_busy()==False and musica:
-            efectosSonido.play(correctoSonido)        
-        if Asterisca(pal,letrasdadas)==pal:
+    if risk:
+        if letra==pal:
+            for letra in pal:
+                letrasdadas.append(letra)
             if cliente!=None:
                 cliente.send("RESULT1".encode(FORMAT))
                 return
             else:
                 Finjuego(True,cliente,pal)
                 return
-    # Se actualiza la información del GUI
-    palabraLabel.config(text=Asterisca(pal,letrasdadas))
-    vidaLabel.config(text="Vidas: "+str(vidas))
-    horcaLabel.config(image=imagenes[6-vidas])
-    letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
-    letraEntrada.delete(0,END)
+        else:
+            vidas=0
+            if cliente!=None:
+                cliente.send("RESULT0".encode(FORMAT))
+                return
+            else:
+                Finjuego(False,cliente,pal)
+                return
+    else:
+        #Se comprueba que la letra sea válida
+        if len(letra)<1:
+            messagebox.showerror("Error","Introduce alguna letra")
+            return
+        if len(letra)>1 or not(letra.isalpha()):
+            messagebox.showerror("Error","Introduce una sola letra")
+            letraEntrada.delete(0,END)
+            return
+        if letra in letrasdadas:
+            messagebox.showinfo("","Ya has introducido esa letra")
+            letraEntrada.delete(0,END)
+            return
+        letrasdadas.append(letra.lower())
+        #Ahora se comprueba si la letra está en la palabra o no
+        if letra not in pal:
+            cancionActual="incorrecto"
+            incorrectoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\incorrectoSound.mp3")
+            if efectosSonido.get_busy()==False and musica:
+                efectosSonido.play(incorrectoSonido)
+            vidas-=1
+            if vidas==0:
+                if cliente!=None:
+                    cliente.send("RESULT0".encode(FORMAT))
+                    return
+                else:
+                    Finjuego(False,cliente,pal)
+                    return
+            elif vidas==1:
+                Pista(pal)
+            elif vidas<=2:
+                botonTeLaJuegas.pack_forget()
+        else:
+            cancionActual="correcto"
+            correctoSonido=pygame.mixer.Sound(currdir+"\\Assets\\Musica\\correctoSound.mp3")
+            if efectosSonido.get_busy()==False and musica:
+                efectosSonido.play(correctoSonido)        
+            if Asterisca(pal,letrasdadas)==pal:
+                if cliente!=None:
+                    cliente.send("RESULT1".encode(FORMAT))
+                    return
+                else:
+                    Finjuego(True,cliente,pal)
+                    return
+        # Se actualiza la información del GUI
+        palabraLabel.config(text=Asterisca(pal,letrasdadas))
+        vidaLabel.config(text="Vidas: "+str(vidas))
+        horcaLabel.config(image=imagenes[6-vidas])
+        letrasusadasLabel.config(text=FormatLetrasUsadas(letrasdadas))
+        letraEntrada.delete(0,END)
 def Pista(pal): #Busca una letra que no se haya dicho ya y la muestra
     letrasrestantes=[]
     for letra in range(0,len(pal)-1):
