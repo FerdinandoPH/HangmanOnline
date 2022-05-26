@@ -289,7 +289,8 @@ def Ahorcado(pal,cliente=None): #Pantalla del juego (se carga al principio de ca
     letraEntrada.pack(pady=5)
     letraEntrada.focus_set()
     if cliente!=None:
-        progLabel=Label(root,text="Al otro jugador le faltan: "+len(pal)+" letras",font=("Times New Roman",15))
+        progLabel=Label(root,text="Al otro jugador le faltan: "+str(len(pal))+" letras",font=("Times New Roman",15))
+        progLabel.pack(pady=5)
     botonTeLaJuegas=Button(root,text="Te la juegas",command=lambda:TeLaJuegas(vidaLabel,botonTeLaJuegas))
     botonLetra=Button(root,text="Enviar",command=lambda:ProcesaLetra(pal,letraEntrada.get(),letrasdadas,palabraLabel,vidaLabel,letrasusadasLabel,letraEntrada,horcaLabel,botonTeLaJuegas,cliente))
     botonLetra.pack(pady=10)

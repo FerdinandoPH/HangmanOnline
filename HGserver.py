@@ -111,7 +111,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         else:
                             palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
-                            while len(palabraAadivinar)>9:
+                            while len(palabraAadivinar)<9:
                                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         print("Palabra a adivinar: ",palabraAadivinar)
                         gameId=idrequest
