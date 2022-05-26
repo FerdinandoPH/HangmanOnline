@@ -102,17 +102,17 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                         partidas[idrequest].j2=conn
                         dificultad=partidas[idrequest].difficulty
                         if dificultad==1:
-                            palabraAadivinar=wlist[random.choice(wlist)]
+                            palabraAadivinar=random.choice(wlist)
                             while len(palabraAadivinar)>5:
-                                palabraAadivinar=wlist[random.choice(wlist)]
+                                palabraAadivinar=random.choice(wlist)
                         elif dificultad==2:
-                            palabraAadivinar=wlist[random.choice(wlist)]
+                            palabraAadivinar=random.choice(wlist)
                             while len(palabraAadivinar)>9 and len(palabraAadivinar)<=5:
-                                palabraAadivinar=wlist[random.choice(wlist)]
+                                palabraAadivinar=random.choice(wlist)
                         else:
-                            palabraAadivinar=wlist[random.choice(wlist)]
+                            palabraAadivinar=random.choice(wlist)
                             while len(palabraAadivinar)<9:
-                                palabraAadivinar=wlist[random.choice(wlist)]
+                                palabraAadivinar=random.choice(wlist)
                         print("Palabra a adivinar: ",palabraAadivinar)
                         gameId=idrequest
                         partidas[idrequest].palabra=palabraAadivinar
