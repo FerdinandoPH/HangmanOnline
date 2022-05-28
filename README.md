@@ -11,7 +11,7 @@ La carpeta "assets" contiene los archivos de sonido, las imágenes, y el diccion
 
 El archivo "autoevaluacion.txt" contiene todas las mejoras hechas al ahorcado original de moodle dado como punto de partida del proyecto (se encuentra en "base")
 
-La carpeta "calentamiento" contiene los archivos "ahorcadov0.py", "ahorcadov1.py" y "ahorcadov2.py", que son versiones básicas del ahorcado que tuve que antes de empezar el proyecto.
+La carpeta "calentamiento" contiene los archivos "ahorcadov0.py", "ahorcadov1.py" y "ahorcadov2.py", que son versiones básicas del ahorcado que tuve que hacer antes de empezar el proyecto.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
