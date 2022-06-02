@@ -143,7 +143,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                             partidas[gameId].j2.send(("RESULT0").encode(FORMAT))
                     time.sleep(0.1)
                     del partidas[gameId]
-        except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa). Se procede a cerrar la conexión
+        except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
             print("ERROR: ",e)
             conectado=False
     print(f"{addr} se ha desconectado")
