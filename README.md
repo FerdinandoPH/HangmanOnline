@@ -1,6 +1,8 @@
 # HangmanOnline
 *Un proyecto de Fernando Pérez y José Antonio Mota (1ºN)*
 
+Documento de explicación del proyecto en: https://docs.google.com/document/d/1oiV2idB05mpaFREwts-LYsxk4QJeZ_l4YuDaI7ISM_8/edit?usp=sharing
+
 Un programa de ahorcado online para clase (1er proyecto de github)
 
 HGserver.py es el programa del servidor (diseñado para Ubuntu 22.04 server)
