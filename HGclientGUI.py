@@ -22,7 +22,7 @@ global cancionActual
 cancionActual=""
 stopRecv=False
 PORT=44444
-SERVER="80.29.24.47"
+SERVER="80.29.131.69"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
