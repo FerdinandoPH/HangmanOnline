@@ -5,7 +5,7 @@ MEJORAS REALIZADAS:
 - Se comprueba que no puedas poner nada que no sea una letra
 - Opción "te la juegas" (si tienes más de dos vidas, puedes intentar adivinar la palabra entera de una vez, pero si fallas, pierdes inmediatamente)
 - Códigos secretos para ganar o perder
-- Cuando queda una vida, el juego te da una pista, que te dice una de las palabras que aún no han sido descubiertas
+- Cuando queda una vida, el juego te da una pista, que te dice una de las letras que aún no han sido descubiertas
 - Tiene efectos de sonido y música (idea patentada)
 - Botones para activar/desactivar la música
 - La ventana cambia de color
