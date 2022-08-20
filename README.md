@@ -1,6 +1,8 @@
 # HangmanOnline
 *Un proyecto de Fernando Pérez y José Antonio Mota (1ºN)*
 
+Documento de explicación del proyecto en: https://docs.google.com/document/d/1oiV2idB05mpaFREwts-LYsxk4QJeZ_l4YuDaI7ISM_8/edit?usp=sharing
+
 Un programa de ahorcado online para clase (1er proyecto de github)
 
 HGserver.py es el programa del servidor (diseñado para Ubuntu 22.04 server)
@@ -11,7 +13,7 @@ La carpeta "assets" contiene los archivos de sonido, las imágenes, y el diccion
 
 El archivo "autoevaluacion.txt" contiene todas las mejoras hechas al ahorcado original de moodle dado como punto de partida del proyecto (se encuentra en "base")
 
-La carpeta "calentamiento" contiene los archivos "ahorcadov0.py", "ahorcadov1.py" y "ahorcadov2.py", que son versiones básicas del ahorcado que tuve que antes de empezar el proyecto.
+La carpeta "calentamiento" contiene los archivos "ahorcadov0.py", "ahorcadov1.py" y "ahorcadov2.py", que son versiones básicas del ahorcado que tuve que hacer antes de empezar el proyecto.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
