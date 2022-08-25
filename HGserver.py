@@ -79,7 +79,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                 print("{} : {}".format(addr,msg))
                 if msg==TERMINATED: #Se cierra la conexión
                     conectado=False
-                elif msg==REMOTE_TERMINATED: #El cliente ha solicitado cerrar la conexión por un error
+                elif msg==REMOTE_TERMINATED: #El cliente ha solicitado cerrar la conexión 
                     conn.send(("ADIOS").encode(FORMAT))
                     conectado=False
                 elif msg[:6]=="SERVER": #Se ha solicitado que se genere una partida (el último caracter es la dificultad)
@@ -116,9 +116,9 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                                 palabraAadivinar=wlist[random.randint(0,len(wlist)-1)]
                         print("Palabra a adivinar: ",palabraAadivinar)
                         gameId=idrequest
-                        partidas[idrequest].palabra=palabraAadivinar
-                        conn.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
-                        partidas[idrequest].j1.send(("Ok"+partidas[idrequest].palabra).encode(FORMAT))
+                        partidas[gameId].palabra=palabraAadivinar
+                        conn.send(("Ok"+partidas[gameId].palabra).encode(FORMAT))
+                        partidas[gameId].j1.send(("Ok"+partidas[gameId].palabra).encode(FORMAT))
                 elif msg[:4]=="PROG": #El servidor envía cuántas letras le quedan al otro jugador
                     progreso=msg[4:]
                     if mode=="Server":
