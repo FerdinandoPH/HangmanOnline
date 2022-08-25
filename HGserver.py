@@ -70,7 +70,7 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
 def handle_client(conn, addr): #Hilo que se genera para cada conexión
     print(f"Nueva conexion de {addr}")
     conectado=True
-    mode="Undef"
+    mode="Undef" #Advertencia: aunque la variable mode inidca si es el J1 o el J2, debido a mi pasada experiencia con el appinventor los llamé "server" al J1 y "client" al J2. Sé que es un poco confuso -_-
     gameId=""
     while conectado:
         try: 
