@@ -3,6 +3,20 @@
 VERSION ANTICUADA
 *****************
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 try:
     import socket,threading,sys,pynput,time
 except:
