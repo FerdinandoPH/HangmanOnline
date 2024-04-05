@@ -22,8 +22,8 @@ def CargaPalabras(): #Trata de cargar las palabras del archivo "diccionario.txt"
             f.close()
     except:
         print("No se ha podido cargar la lista de palabras. Comprueba que el archivo diccionario.txt esté en la carpeta del programa")
-PORT=44444
-SERVER="192.168.1.3"
+PORT=20224
+SERVER="192.168.1.118"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"

@@ -21,8 +21,8 @@ risk=False
 global cancionActual
 cancionActual=""
 stopRecv=False
-PORT=44444
-SERVER="80.29.131.69"
+PORT=20224
+SERVER=socket.gethostbyname("casaperezholguin.ddns.net")
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
