@@ -22,7 +22,10 @@ global cancionActual
 cancionActual=""
 stopRecv=False
 PORT=20224
-SERVER=socket.gethostbyname("casaperezholguin.ddns.net")
+try:
+    SERVER=socket.gethostbyname("casaperezholguin.ddns.net")
+except OSError:
+    SERVER="127.0.0.1"
 ADDR=(SERVER, PORT)
 FORMAT="utf-8"
 TERMINATED="ADIOS"
