@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import socket,threading,random,os,sys,time
 #import pynput
