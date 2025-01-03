@@ -69,6 +69,7 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
         print(f"Conexiones activas: {len(conectados)}")
 def handle_client(conn, addr): #Hilo que se genera para cada conexión
     print(f"Nueva conexion de {addr}")
+    conn.settimeout(300)
     conectado=True
     mode="Undef" #Advertencia: aunque la variable mode inidca si es el J1 o el J2, debido a mi pasada experiencia con el appinventor los llamé "server" al J1 y "client" al J2. Sé que es un poco confuso -_-
     gameId=""
@@ -82,6 +83,8 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                 elif msg==REMOTE_TERMINATED: #El cliente ha solicitado cerrar la conexión 
                     conn.send(("ADIOS").encode(FORMAT))
                     conectado=False
+                elif msg == "VIVO":
+                    pass
                 elif msg[:6]=="SERVER": #Se ha solicitado que se genere una partida (el último caracter es la dificultad)
                     mode="Server"
                     darid=str(random.randint(1000,9999))

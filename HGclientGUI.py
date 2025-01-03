@@ -155,6 +155,9 @@ def ConectaAlServer(): #Intenta conectarse al servidor, si no lo consigue, muest
         recvThread=threading.Thread(target=recv_server, args=(client,))
         recvThread.daemon=True
         recvThread.start()
+        vivoThread=threading.Thread(target=mandaVivo, args=(client,))
+        vivoThread.daemon=True
+        vivoThread.start()
         print("Se ha establecido la conexión al servidor")
         InicioOnline(client)
     except:
@@ -183,6 +186,14 @@ def FormatLetrasUsadas(letrasdadas): #Convierte la lista de letras usadas en una
         if i!=len(letrasdadas)-1:
             nuevapal+=", "
     return nuevapal
+def mandaVivo(cliente): #Manda un mensaje al servidor para comprobar si la conexión sigue activa
+    global stopRecv
+    while not stopRecv:
+        try:
+            cliente.send("VIVO".encode(FORMAT))
+            time.sleep(120)
+        except:
+            pass
 def CancelaPartida(cliente,id): #Cancela la espera a otro jugador, y vuelve a la pantalla de inicio online
     cliente.send(("CANCEL"+str(id)).encode(FORMAT))
     print("Partida cancelada")
