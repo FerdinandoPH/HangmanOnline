@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import socket,threading,random,os,sys,time
+import socket,threading,random,os,sys,time, datetime
 #import pynput
 
 currdir=os.path.dirname(os.path.abspath(__file__))
@@ -57,6 +57,8 @@ def Stats():
     with pynput.keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 '''
+def ahora():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas conexiones
     server.listen()
     while True:
@@ -66,9 +68,9 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
         thread=threading.Thread(target=handle_client, args=(conn, addr))
         thread.daemon=True
         thread.start()
-        print(f"Conexiones activas: {len(conectados)}")
+        print(f"{ahora()}: Conexiones activas: {len(conectados)}")
 def handle_client(conn, addr): #Hilo que se genera para cada conexión
-    print(f"Nueva conexion de {addr}")
+    print(f"{ahora()}: Nueva conexion de {addr}")
     conn.settimeout(300)
     conectado=True
     mode="Undef" #Advertencia: aunque la variable mode inidca si es el J1 o el J2, debido a mi pasada experiencia con el appinventor los llamé "server" al J1 y "client" al J2. Sé que es un poco confuso -_-
@@ -147,15 +149,15 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                     time.sleep(0.1)
                     del partidas[gameId]
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
-            print("ERROR: ",e)
+            print(f"{ahora()}ERROR: ",e)
             conectado=False
-    print(f"{addr} se ha desconectado")
+    print(f"{ahora()}: {addr} se ha desconectado")
     BorraTrazas(conn)
     conn.close()
     conectadosaddr.remove(addr)
     conectados.remove(conn)
-    print(f"Conexiones activas: {len(conectados)}")
-print("Servidor escuchando en:", SERVER, ":", PORT)
+    print(f"{ahora()}: Conexiones activas: {len(conectados)}")
+print(f"{ahora()}: Servidor escuchando en:", SERVER, ":", PORT)
 '''
 def on_press(key):
     try:
