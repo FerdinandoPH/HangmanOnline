@@ -149,10 +149,13 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                     time.sleep(0.1)
                     del partidas[gameId]
                 else:
-                    print(f"{ahora()}ERROR: Mensaje no reconocido")
-                    conectado=False
+                    raise ValueError("Mensaje no reconocido")
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
             print(f"{ahora()}ERROR: ",e)
+            try:
+                conn.send(("ADIOS").encode(FORMAT))
+            except:
+                pass
             conectado=False
     print(f"{ahora()}: {addr} se ha desconectado")
     BorraTrazas(conn)

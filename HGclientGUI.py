@@ -21,6 +21,7 @@ risk=False
 global cancionActual
 cancionActual=""
 stopRecv=False
+online = False
 PORT=20224
 try:
     SERVER=socket.gethostbyname("casaperezholguin.ddns.net")
@@ -109,6 +110,8 @@ def ColorCambio(raiz): #Cambia el color de fondo de la ventana y de las etiqueta
 def Inicio(): #Carga la pantalla inicial, con el botón de inicio online, offline y salir, además de las opciones para la música y el cambio de color
     global colorclock
     global musica
+    global online
+    online = False
     root.title("HGclientGUI")
     TkinterClear(root)
     root.geometry("400x300")
@@ -165,6 +168,8 @@ def ConectaAlServer(): #Intenta conectarse al servidor, si no lo consigue, muest
 def InicioOnline(cliente): #Carga la pantalla de inicio online, con los botones para crear una partida o unirse a una ya creada y el botón de desconectarse
     global musica
     global cancionActual
+    global online
+    online = True
     TkinterClear(root,False,"menu")
     if musica and cancionActual!="menu":
         cancionActual="menu"
