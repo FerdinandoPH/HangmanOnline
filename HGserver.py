@@ -71,7 +71,7 @@ def start(): #Función que se encarga de iniciar el servidor y escuchar nuevas c
         print(f"{ahora()}: Conexiones activas: {len(conectados)}")
 def handle_client(conn, addr): #Hilo que se genera para cada conexión
     print(f"{ahora()}: Nueva conexion de {addr}")
-    conn.settimeout(300)
+    conn.settimeout(60)
     conectado=True
     mode="Undef" #Advertencia: aunque la variable mode inidca si es el J1 o el J2, debido a mi pasada experiencia con el appinventor los llamé "server" al J1 y "client" al J2. Sé que es un poco confuso -_-
     gameId=""
@@ -148,6 +148,9 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                             partidas[gameId].j2.send(("RESULT0").encode(FORMAT))
                     time.sleep(0.1)
                     del partidas[gameId]
+                else:
+                    print(f"{ahora()}ERROR: Mensaje no reconocido")
+                    conectado=False
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
             print(f"{ahora()}ERROR: ",e)
             conectado=False

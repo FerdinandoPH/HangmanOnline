@@ -191,7 +191,7 @@ def mandaVivo(cliente): #Manda un mensaje al servidor para comprobar si la conex
     while not stopRecv:
         try:
             cliente.send("VIVO".encode(FORMAT))
-            time.sleep(120)
+            time.sleep(40)
         except:
             pass
 def CancelaPartida(cliente,id): #Cancela la espera a otro jugador, y vuelve a la pantalla de inicio online
