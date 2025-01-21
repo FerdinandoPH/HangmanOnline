@@ -151,7 +151,7 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                 else:
                     raise ValueError("Mensaje no reconocido")
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
-            print(f"{ahora()}ERROR: ",e)
+            print(f"{ahora()}: ERROR: ",e)
             try:
                 conn.send(("ADIOS").encode(FORMAT))
             except:
