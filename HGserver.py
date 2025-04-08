@@ -150,6 +150,10 @@ def handle_client(conn, addr): #Hilo que se genera para cada conexión
                     del partidas[gameId]
                 else:
                     raise ValueError("Mensaje no reconocido")
+            else:
+                print(f"{ahora()}: ERROR: Mensaje nulo??")
+                conn.send(("ERROR").encode(FORMAT))
+                raise ValueError("Mensaje nulo??")
         except Exception as e: #Ha ocurrido un error (normalmente es porque el cliente ha cerrado el programa con la X). Se procede a cerrar la conexión
             print(f"{ahora()}: ERROR: ",e)
             try:
